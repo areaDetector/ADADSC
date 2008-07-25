@@ -1,0 +1,2 @@
+* Once exposure shutter controls defined and implemented in AD base, add
+  support for controlling the exposure shutter in this driver.
