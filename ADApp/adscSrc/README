@@ -1,7 +1,8 @@
-This is a driver for ADSC <http://www.adsc-xray.com/> detectors.  It has been
-tested with the ADSC Q210.  While not yet tested with other models, it should 
-work with the ADSC Q4 (with the upgrade to four computers), Q4r, Q210, Q210r,
-Q270, Q315, and Q315r.
+This is a driver for ADSC <http://www.adsc-xray.com/> detectors.  Supported
+models are: Q4 (with the upgrade to four computers), Q4r, Q210, Q210r, Q270,
+Q315, and Q315r.  This driver has been tested with the Q210 and Q210r.  If you
+use this driver, please report your success, noting your detector model, to
+the author.
 
 Please consult ../../documentation/adscDoc.html for the complete documentation
 for this driver.
