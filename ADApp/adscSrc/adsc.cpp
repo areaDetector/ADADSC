@@ -804,7 +804,7 @@ AdscStatus_t adsc::resetControlLibrary()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:resetControlLibrary "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:resetControlLibrary "
               "error, status=%d\n", driverName, status);
     return AdscStatusError;
 }
@@ -824,7 +824,7 @@ AdscStatus_t adsc::readDetectorCondition()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:readDetectorCondition "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:readDetectorCondition "
               "error, status=%d\n", driverName, status);
     return AdscStatusError;
 }
@@ -849,7 +849,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeDataset()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
               "error, status=%d\n", driverName, status);
     return AdscStatusError;
 }
@@ -884,7 +884,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeImage()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
               "error, status=%d\n", driverName, status);
     return AdscStatusError;
 }
@@ -931,7 +931,7 @@ AdscStatus_t adsc::loadPerDatasetParameters()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:loadPerDatasetParameters error, failed to read parameter "
               "values\n", driverName);
     return AdscStatusError;
@@ -969,7 +969,7 @@ AdscStatus_t adsc::loadPerImageParameters()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:loadPerImageParameters error, failed to read parameter "
               "values\n", driverName);
     return AdscStatusError;
@@ -1018,7 +1018,7 @@ void adsc::acquisitionFinished(int adstatus)
     this->lastImage = 0;
 
     if (status == 0) return;
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:acquisitionFinished error, failed to set ADStatus, "
               "ADAcquire to Done, or callParamCallbacks failed\n",
               driverName);
@@ -1077,7 +1077,7 @@ AdscStatus_t adsc::acquireImages()
             } else {
                 numConsecutiveRetries++;
                 if (numConsecutiveRetries > 3) {
-                    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+                    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
                               "%s:acquireImages error, takeImage returned "
                               "AdscStatusAgain more than 3 consecutive "
                               "times\n", driverName);
@@ -1109,7 +1109,7 @@ AdscStatus_t adsc::acquireImages()
                 if (status == epicsEventWaitOK) {
                     return AdscStatusInterrupt;
                 } else {
-                    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+                    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
                               "%s:acquireImages error, "
                               "epicsEventWaitWithTimeout returned with "
                               "status=%d\n", driverName, status);
@@ -1148,7 +1148,7 @@ AdscStatus_t adsc::takeDarksIfRequired()
         fullFileNameCopy[sizeof(fullFileNameCopy) - 1] = '\0';
         fullDirName = dirname(fullFileNameCopy);
         if (fullDirName == NULL) {
-            asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
                       "%s:takeDarksIfRequired error, dirname failed\n",
                       driverName);
             return AdscStatusError;
@@ -1176,7 +1176,7 @@ AdscStatus_t adsc::createFileNameNoIncrement(char *dst, size_t dstSize)
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:createFileNameNoIncrement error, getting or setting "
               "ADAutoIncrement or ADUtils->createFileNameNoIncrement failed "
               "with ORed status=%d\n", driverName, status);
@@ -1197,7 +1197,7 @@ AdscStatus_t adsc::setOkToExpose(int isEnabled)
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:setOkToExpose error, "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:setOkToExpose error, "
               "failed to set AdscOkToExpose or call callbacks\n", driverName);
     return AdscStatusError;
 }
@@ -1217,7 +1217,7 @@ AdscStatus_t adsc::setExternalTriggerControl(AdscExternalTriggerControl_t
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:setExternalTriggerControl error, failed to set "
               "AdscExternalTriggerControl or call callbacks\n", driverName);
     return AdscStatusError;
@@ -1233,7 +1233,7 @@ AdscStatus_t adsc::waitForExternalTrigger(epicsEventId eventId)
     if (status == epicsEventWaitTimeout) return AdscStatusOk;
     if (status == epicsEventWaitOK) return AdscStatusInterrupt;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:waitForExternalTrigger error, failed checking "
               "for interrupt signal after event signal\n", driverName);
     return AdscStatusError;
@@ -1258,7 +1258,7 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
     epicsMutexUnlock(this->mutexId);
 
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeDarks error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks error, "
                   "CCDSetFilePar for FLP_TIME failed\n", driverName);
         return AdscStatusError;
     }
@@ -1271,7 +1271,7 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
                                         PATH_COMPONENT_SEPARATOR);
         if (numCharsPrinted < 0 ||
                 numCharsPrinted >= (int)sizeof(fullFileName)) {
-            asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeDarks "
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks "
                       "error, failed to create full file name\n", driverName);
             return AdscStatusError;
         }
@@ -1285,7 +1285,7 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
         if (status == AdscStatusAgain) {
             numRetries++;
             if (numRetries > 3) {
-                asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeDarks "
+                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks "
                           "error, takeImage returned AdscStatusAgain more "
                           "than 3 times while trying to take darks\n",
                           driverName);
@@ -1322,14 +1322,14 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     fexposureTime = (float)this->perDatasetExposureTime;
     status = CCDSetFilePar(FLP_TIME, (char *)&fexposureTime);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeImage error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_TIME failed\n", driverName);
         epicsMutexUnlock(this->mutexId);
         return AdscStatusError;
     }
     status = CCDSetFilePar(FLP_KIND, (char *)&imageKind);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeImage error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_KIND failed\n", driverName);
         epicsMutexUnlock(this->mutexId);
         return AdscStatusError;
@@ -1337,7 +1337,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     status = CCDSetFilePar(FLP_FILENAME, strlen(fullFileName) == 0 ?
                            "_null_" : fullFileName);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeImage error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_FILENAME failed\n", driverName);
         epicsMutexUnlock(this->mutexId);
         return AdscStatusError;
@@ -1346,7 +1346,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
         status = CCDSetHwPar(HWP_STORED_DARK,
                              (char *)&this->perDatasetStoredDarks);
         if (status != 0) {
-            asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeImage "
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage "
                       "error, CCDSetHwPar for HWP_STORED_DARK failed\n",
                       driverName);
             epicsMutexUnlock(this->mutexId);
@@ -1399,7 +1399,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
             if (status == epicsEventWaitOK) {
                 return AdscStatusInterrupt;
             } else {
-                asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:takeImage "
+                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage "
                           "error, epicsEventWaitWithTimeout returned "
                           "status=%d\n", driverName, status);
                 return AdscStatusError;
@@ -1443,7 +1443,7 @@ AdscStatus_t adsc::getImage(int lastImage)
     epicsMutexMustLock(this->mutexId);
     status = CCDSetFilePar(FLP_LASTIMAGE, (char *)&lastImage);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:getImage error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:getImage error, "
                   "CCDSetFilePar for FLP_LASTIMAGE failed with return "
                   "status=%d\n", driverName, status);
         epicsMutexUnlock(this->mutexId);
@@ -1454,7 +1454,7 @@ AdscStatus_t adsc::getImage(int lastImage)
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:getImage error, "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:getImage error, "
               "CCDGetImage failed with return status=%d\n", driverName,
               status);
     return AdscStatusError;
@@ -1469,7 +1469,7 @@ AdscStatus_t adsc::startExposure()
     status = CCDStartExposure();
     epicsMutexUnlock(this->mutexId);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:startExposure "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:startExposure "
                   "error, CCDStartExposure failed with return status=%d\n",
                   driverName, status);
         return AdscStatusError;
@@ -1488,7 +1488,7 @@ AdscStatus_t adsc::startExposure()
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:startExposure error, "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:startExposure error, "
               "setting ADStatus or calling callbacks failed\n", driverName);
     return AdscStatusError;
 }
@@ -1502,7 +1502,7 @@ AdscStatus_t adsc::stopExposure()
     status = CCDStopExposure();
     epicsMutexUnlock(this->mutexId);
     if (status != 0) {
-        asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:stopExposure error, "
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:stopExposure error, "
                   "CCDStopExposure failed with return status=%d\n",
                   driverName, status);
         return AdscStatusError;
@@ -1530,7 +1530,7 @@ AdscStatus_t adsc::stopExposure()
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR, "%s:stopExposure error, "
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:stopExposure error, "
               "setting ADStatus or calling callbacks failed\n", driverName);
     return AdscStatusError;
 }
@@ -1568,14 +1568,14 @@ AdscStatus_t adsc::waitForDetectorState(int desiredState, double timeout,
         }
 
         if (state == DTC_STATE_RETRY) {
-            asynPrint(this->pasynUser, ASYN_TRACE_FLOW,
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW,
                       "%s:waitForDetectorState, got RETRY state, returning "
                       "AdscStatusAgain\n", driverName);
             return AdscStatusAgain;
         }
 
         if (failOnErrorState && state == DTC_STATE_ERROR) {
-            asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
                       "%s:waitForDetectorState error, detector state was "
                       "ERROR\n", driverName);
             return AdscStatusError;
@@ -1591,7 +1591,7 @@ AdscStatus_t adsc::waitForDetectorState(int desiredState, double timeout,
         } else if (status == epicsEventWaitOK) {
             return AdscStatusInterrupt;
         } else {
-            asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
                       "%s:waitForDetectorState error, "
                       "epicsEventWaitWithTimeout returned with status=%d\n",
                       driverName, status);
@@ -1648,7 +1648,7 @@ AdscStatus_t adsc::imageAcquired()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUser, ASYN_TRACE_ERROR,
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:imageAcquired error, failed while updating image counter "
               "value, next file number, or full file name\n", driverName);
     return AdscStatusError;
