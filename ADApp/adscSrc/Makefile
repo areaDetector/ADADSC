@@ -64,7 +64,7 @@ LIBRARY_IOC_solaris  += adsc
 
 LIB_SRCS += adsc.cpp
 LIB_SRCS += drvAdscEpics.c
-LIB_LIBS += ADBase ADPlugin
+LIB_LIBS += NDPlugin ADBase
 ifeq (YES, $(USE_SIMADSC))
   LIB_LIBS += simadsc
 else
@@ -89,7 +89,7 @@ adscApp_SRCS_vxWorks += adscApp_registerRecordDeviceDriver.cpp
 
 # Add locally compiled object code
 adscApp_LIBS += adsc
-adscApp_LIBS += ADBase ADPlugin
+adscApp_LIBS += NDPlugin ADBase
 ifeq (YES, $(USE_SIMADSC))
   adscApp_LIBS += simadsc
 else
