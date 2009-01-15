@@ -70,7 +70,7 @@ ifeq (YES, $(USE_SIMADSC))
 else
   LIB_LIBS += detcon_th auxlib
 endif
-LIB_LIBS += sscan autosave
+LIB_LIBS += busy sscan autosave
 LIB_LIBS += asyn
 LIB_LIBS += $(EPICS_BASE_IOC_LIBS)
 
@@ -95,7 +95,7 @@ ifeq (YES, $(USE_SIMADSC))
 else
   adscApp_LIBS += detcon_th auxlib
 endif
-adscApp_LIBS += sscan autosave 
+adscApp_LIBS += busy sscan autosave 
 adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
