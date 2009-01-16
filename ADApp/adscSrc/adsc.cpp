@@ -1408,10 +1408,6 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     }
 
     if (status2 == AdscStatusAgain) {
-        /* WORKAROUND: Should use CCDAbort() here, but that fails because in
-         * exec_ccd_abort() it tries to call exec_ccd_get_image(1) which fails
-         * because the state is not IDLE, it's RETRY.  Until ADSC fixes this,
-         * use CCDReset() instead. */
         epicsMutexMustLock(this->mutexId);
         CCDReset();
         epicsMutexUnlock(this->mutexId);
