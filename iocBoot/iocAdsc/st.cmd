@@ -13,6 +13,7 @@ adscApp_registerRecordDeviceDriver(pdbbase)
 adscConfig("ADSC1","Q210r")
 dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/ADBase.template","P=13ADSC1:,R=det1:,PORT=ADSC1,ADDR=0,TIMEOUT=1")
 dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/adsc.template","P=13ADSC1:,R=det1:,PORT=ADSC1,ADDR=0,TIMEOUT=1")
+dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/NDFile.template","P=13ADSC1:,R=det1:,PORT=ADSC1,ADDR=0,TIMEOUT=1")
 
 #asynSetTraceMask("ADSC1",0,255)
 
