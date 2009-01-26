@@ -1141,7 +1141,7 @@ AdscStatus_t adsc::takeDarksIfRequired()
     if (!shouldTakeDarks()) return AdscStatusOk;
 
     if (strlen(this->perImageFullFileName) == 0) {
-        strcpy(fullDirName, "");
+        fullDirName = (char *)"";
     } else {
         strncpy(fullFileNameCopy, this->perImageFullFileName,
                 sizeof(fullFileNameCopy) - 1);
