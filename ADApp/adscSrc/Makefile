@@ -4,16 +4,12 @@ include $(TOP)/configure/CONFIG
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 #=============================
 
-# Set to YES or NO to use or not use simadsc simulation library instead of
-# real ADSC detcon_lib_th library
+# Set to YES or NO to use or not use the simadsc simulation library instead of
+# the real ADSC detcon_lib_th library
 
-USE_SIMADSC = NO
+USE_SIMADSC = YES
 
-# simadsc location (only used if USE_SIMADSC is YES)
-
-SIMADSC_HOME = /opt/simadsc
-
-# ADSC control software location
+# ADSC control software location (only used if USE_SIMADSC is NO)
 
 ADSC_HOME = /opt/adscdc
 
@@ -23,22 +19,19 @@ endif
 
 # The required ADSC header files are detcon_entry.h, detcon_par.h, and
 # detcon_state.h.  USR_INCLUDES should include the directories containing
-# these header files.
+# these header files (only used if USE_SIMADSC is NO).
 
-USR_INCLUDES += -I$(ADSC_HOME)/src_std/incl
-USR_INCLUDES += -I$(ADSC_HOME)/src_std/detcon_lib_th
-
-ifeq (YES, $(USE_SIMADSC))
-  USR_INCLUDES += -I$(SIMADSC_HOME)/include
+ifeq (NO, $(USE_SIMADSC))
+  USR_INCLUDES += -I$(ADSC_HOME)/src_std/incl
+  USR_INCLUDES += -I$(ADSC_HOME)/src_std/detcon_lib_th
 endif
 
 # The required ADSC library files are libauxlib.a and libdetcon_th.a.  A
 # corresponding <name>_DIR definition is required for each of these and should
-# be set to the directory containing the library.
+# be set to the directory containing the library (only used if USE_SIMADSC is
+# NO).
 
-ifeq (YES, $(USE_SIMADSC))
-  simadsc_DIR = $(SIMADSC_HOME)/lib
-else
+ifeq (NO, $(USE_SIMADSC))
   ifeq (cygwin32, $(OS_CLASS))
     auxlib_DIR    = $(ADSC_HOME)/lib/cygwin
     detcon_th_DIR = $(ADSC_HOME)/lib/cygwin
@@ -62,12 +55,18 @@ LIBRARY_IOC_Darwin   += adsc
 LIBRARY_IOC_Linux    += adsc
 LIBRARY_IOC_solaris  += adsc
 
+ifeq (YES, $(USE_SIMADSC))
+  SRC_DIRS += ../simadsc
+endif
+
 LIB_SRCS += adsc.cpp
 LIB_SRCS += drvAdscEpics.c
-LIB_LIBS += NDPlugin ADBase
 ifeq (YES, $(USE_SIMADSC))
-  LIB_LIBS += simadsc
-else
+  LIB_SRCS += simadsc.c
+endif
+
+LIB_LIBS += NDPlugin ADBase
+ifeq (NO, $(USE_SIMADSC))
   LIB_LIBS += detcon_th auxlib
 endif
 LIB_LIBS += busy sscan autosave
@@ -89,10 +88,8 @@ adscApp_SRCS_vxWorks += adscApp_registerRecordDeviceDriver.cpp
 
 # Add locally compiled object code
 adscApp_LIBS += adsc
-adscApp_LIBS += NDPlugin ADBase
-ifeq (YES, $(USE_SIMADSC))
-  adscApp_LIBS += simadsc
-else
+adscApp_LIBS += NDPlugin ADBase netCDF
+ifeq (NO, $(USE_SIMADSC))
   adscApp_LIBS += detcon_th auxlib
 endif
 adscApp_LIBS += busy sscan autosave 
