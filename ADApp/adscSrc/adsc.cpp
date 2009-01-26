@@ -54,7 +54,7 @@ extern "C" {
 #define STOP_EXPOSURE_TIMEOUT 10.0
 #define STATE_POLL_DELAY 0.05
 
-static char *driverName = "drvAdsc";
+static const char *driverName = "drvAdsc";
 
 static int DriverConfiguredForOnePort = 0;
 static int AdscDetCtrlLibInitialized = 0;
@@ -84,7 +84,7 @@ typedef enum {
     AdscQ315r
 } AdscModel_t;
 
-static char *AdscModelStrings[] = {
+static const char *AdscModelStrings[] = {
     "Q4","Q4r","Q210","Q210r","Q270","Q315","Q315r"
 };
 
@@ -108,7 +108,7 @@ static AdscSensor_t AdscSensors[] = {
     { 6144, 6144, 16 }  /* Q315r */
 };
 
-static char *AdscCcdStateStrings[] = {
+static const char *AdscCcdStateStrings[] = {
     "IDLE","EXPOSING","READING","ERROR","CONFIGDET","RETRY","TEMPCONTROL"
 };
 
@@ -123,7 +123,7 @@ typedef enum {
     AdscTriggerStartExternal
 } AdscTriggerStartMode_t;
 
-static char *AdscTriggerStartStrings[] = {
+static const char *AdscTriggerStartStrings[] = {
     "Internal","External"
 };
 
@@ -663,7 +663,7 @@ adsc::adsc(const char *portName, const char *modelName)
     : ADDriver(portName, 1, ADLastDriverParam, 0, 0, 0, 0)
 {
     int status = asynSuccess;
-    char *functionName = "adscConfig";
+    const char *functionName = "adscConfig";
     int addr = 0;
     epicsTimeStamp startTime, endTime;
     double elapsedTime;
@@ -1136,12 +1136,12 @@ AdscStatus_t adsc::acquireImages()
 AdscStatus_t adsc::takeDarksIfRequired()
 {
     char fullFileNameCopy[MAX_FILENAME_LEN];
-    char *fullDirName;
+    char *fullDirName=NULL;
 
     if (!shouldTakeDarks()) return AdscStatusOk;
 
     if (strlen(this->perImageFullFileName) == 0) {
-        fullDirName = "";
+        strcpy(fullDirName, "");
     } else {
         strncpy(fullFileNameCopy, this->perImageFullFileName,
                 sizeof(fullFileNameCopy) - 1);
