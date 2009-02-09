@@ -96,6 +96,8 @@ adscApp_LIBS += busy sscan autosave
 adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
+PROD_SYS_LIBS_cygwin32 += rpc
+
 #=============================
 
 include $(TOP)/configure/RULES
