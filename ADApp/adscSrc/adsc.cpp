@@ -663,7 +663,7 @@ adsc::adsc(const char *portName, const char *modelName)
     : ADDriver(portName, 1, ADLastDriverParam, 
                0, 0,             /* maxBuffers and maxMemory are 0 because we don't support NDArray callbacks yet */
                0, 0,             /* No interfaces beyond those set in ADDriver.cpp */
-               ASYN_CANBLOCK, 1, /* ASYN_CANBLOCK=0, ASYN_MULTIDEVICE=0, autoConnect=1 */
+               ASYN_CANBLOCK, 1, /* ASYN_CANBLOCK=1, ASYN_MULTIDEVICE=0, autoConnect=1 */
                0, 0)             /* priority and stackSize=0, so use defaults */
 {
     int status = asynSuccess;
