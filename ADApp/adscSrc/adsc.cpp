@@ -797,14 +797,14 @@ AdscStatus_t adsc::resetControlLibrary()
     int status = 0;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= CCDAbort();
     status |= CCDReset();
     status |= setIntegerParam(addr, ADStatus, ADStatusIdle);
     status |= readDetectorCondition();
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -818,13 +818,13 @@ AdscStatus_t adsc::readDetectorCondition()
     int status = 0;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= setIntegerParam(addr, AdscState, CCDState());
     status |= setStringParam(addr, AdscStatus, CCDStatus());
     status |= setStringParam(addr, AdscLastError, CCDGetLastError());
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -838,7 +838,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeDataset()
     int status = 0;
     int ival;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= CCDSetHwPar(HWP_BIN, (char *)&this->perDatasetBin);
     status |= CCDSetHwPar(HWP_ADC, (char *)&this->perDatasetAdc);
@@ -849,7 +849,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeDataset()
                           (char *)&this->perDatasetStoredDarks);
     status |= CCDSetFilePar(FLP_AXIS, (char *)&this->perDatasetAxis);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -863,7 +863,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeImage()
     int status = 0;
     float fval;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     fval = (float)this->perImageBeamCenterX;
     status |= CCDSetFilePar(FLP_BEAM_X, (char *)&fval);
@@ -884,7 +884,7 @@ AdscStatus_t adsc::writeDetectorParametersBeforeImage()
     fval = (float)this->perImageKappa;
     status |= CCDSetFilePar(FLP_KAPPA, (char *)&fval);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -898,7 +898,7 @@ AdscStatus_t adsc::loadPerDatasetParameters()
     int status = 0;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= getIntegerParam(addr, AdscReuseDarks,
                               &this->perDatasetReuseDarks);
@@ -931,7 +931,7 @@ AdscStatus_t adsc::loadPerDatasetParameters()
     status |= getDoubleParam(addr, ADAcquirePeriod,
                              &this->perDatasetAcquirePeriod);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -946,7 +946,7 @@ AdscStatus_t adsc::loadPerImageParameters()
     int status = 0;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= getDoubleParam(addr, AdscBeamCenterX,
                              &this->perImageBeamCenterX);
@@ -969,7 +969,7 @@ AdscStatus_t adsc::loadPerImageParameters()
     status |= createFileNameNoIncrement(this->perImageFullFileName,
                                         sizeof(this->perImageFullFileName));
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -1011,13 +1011,13 @@ void adsc::acquisitionFinished(int adstatus)
     int status = 0;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = setIntegerParam(addr, ADStatus, adstatus);
     status |= setIntegerParam(addr, ADAcquire, 0);
     status |= callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     this->lastImage = 0;
 
@@ -1167,7 +1167,7 @@ AdscStatus_t adsc::createFileNameNoIncrement(char *dst, size_t dstSize)
     int addr = 0;
     int autoIncrement;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = getIntegerParam(addr, ADAutoIncrement, &autoIncrement);
     if (status == 0) {
@@ -1176,7 +1176,7 @@ AdscStatus_t adsc::createFileNameNoIncrement(char *dst, size_t dstSize)
         status |= setIntegerParam(addr, ADAutoIncrement, autoIncrement);
     }
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -1192,12 +1192,12 @@ AdscStatus_t adsc::setOkToExpose(int isEnabled)
     int status;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = setIntegerParam(addr, AdscOkToExpose, isEnabled);
     status |= callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == asynSuccess) return AdscStatusOk;
 
@@ -1212,12 +1212,12 @@ AdscStatus_t adsc::setExternalTriggerControl(AdscExternalTriggerControl_t
     int status;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = setIntegerParam(addr, AdscExternalTriggerControl, value);
     status |= callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == asynSuccess) return AdscStatusOk;
 
@@ -1254,12 +1254,12 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
     char fullFileName[MAX_FILENAME_LEN];
     int numRetries;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     fexposureTime = (float)this->perDatasetExposureTime;
     status = CCDSetFilePar(FLP_TIME, (char *)&fexposureTime);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks error, "
@@ -1322,20 +1322,20 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     status = writeDetectorParametersBeforeImage();
     if (status != AdscStatusOk) return AdscStatusError;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
     fexposureTime = (float)this->perDatasetExposureTime;
     status = CCDSetFilePar(FLP_TIME, (char *)&fexposureTime);
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_TIME failed\n", driverName);
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return AdscStatusError;
     }
     status = CCDSetFilePar(FLP_KIND, (char *)&imageKind);
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_KIND failed\n", driverName);
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return AdscStatusError;
     }
     status = CCDSetFilePar(FLP_FILENAME, strlen(fullFileName) == 0 ?
@@ -1343,7 +1343,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
                   "CCDSetFilePar for FLP_FILENAME failed\n", driverName);
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return AdscStatusError;
     }
     if (this->perDatasetStoredDarks) {
@@ -1353,11 +1353,11 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
             asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage "
                       "error, CCDSetHwPar for HWP_STORED_DARK failed\n",
                       driverName);
-            epicsMutexUnlock(this->mutexId);
+            this->unlock();
             return AdscStatusError;
         }
     }
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     status = startExposure();
     if (status != AdscStatusOk) return (AdscStatus_t)status;
@@ -1375,12 +1375,12 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
         if (status == epicsEventWaitOK) wasAborted = 1;
     }
     if (wasAborted) {
-        epicsMutexMustLock(this->mutexId);
+        this->lock();
 
         setIntegerParam(addr, ADStatus, ADStatusAborting);
         callParamCallbacks(addr, addr);
 
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
     }
 
     /* XXX Close shutter behavior goes here.  Currently not implemented in
@@ -1390,16 +1390,16 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
 
     if (triggerMode == AdscTriggerStartExternal) {
         if (status != AdscStatusOk) {
-            epicsMutexMustLock(this->mutexId);
+            this->lock();
             CCDAbort();
-            epicsMutexUnlock(this->mutexId);
+            this->unlock();
             return (AdscStatus_t)status;
         }
     } else {
         if (status != epicsEventWaitTimeout) {
-            epicsMutexMustLock(this->mutexId);
+            this->lock();
             CCDAbort();
-            epicsMutexUnlock(this->mutexId);
+            this->unlock();
             if (status == epicsEventWaitOK) {
                 return AdscStatusInterrupt;
             } else {
@@ -1412,14 +1412,14 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     }
 
     if (status2 == AdscStatusAgain) {
-        epicsMutexMustLock(this->mutexId);
+        this->lock();
         CCDReset();
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return (AdscStatus_t)status2;
     } else if (status2 != AdscStatusOk) {
-        epicsMutexMustLock(this->mutexId);
+        this->lock();
         CCDAbort();
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return (AdscStatus_t)status2;
     }
 
@@ -1440,17 +1440,17 @@ AdscStatus_t adsc::getImage(int lastImage)
 {
     int status;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
     status = CCDSetFilePar(FLP_LASTIMAGE, (char *)&lastImage);
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:getImage error, "
                   "CCDSetFilePar for FLP_LASTIMAGE failed with return "
                   "status=%d\n", driverName, status);
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return AdscStatusError;
     }
     status = CCDGetImage();
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -1465,9 +1465,9 @@ AdscStatus_t adsc::startExposure()
     int status;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
     status = CCDStartExposure();
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:startExposure "
                   "error, CCDStartExposure failed with return status=%d\n",
@@ -1479,12 +1479,12 @@ AdscStatus_t adsc::startExposure()
                                   1);
     if (status != AdscStatusOk) return (AdscStatus_t)status;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = setIntegerParam(addr, ADStatus, ADStatusAcquire);
     status |= callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == asynSuccess) return AdscStatusOk;
 
@@ -1498,9 +1498,9 @@ AdscStatus_t adsc::stopExposure()
     int status;
     int addr = 0;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
     status = CCDStopExposure();
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
     if (status != 0) {
         asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:stopExposure error, "
                   "CCDStopExposure failed with return status=%d\n",
@@ -1510,23 +1510,23 @@ AdscStatus_t adsc::stopExposure()
 
     status = waitForDetectorState(DTC_STATE_IDLE, STOP_EXPOSURE_TIMEOUT, 1);
     if (status == AdscStatusAgain) {
-        epicsMutexMustLock(this->mutexId);
+        this->lock();
 
         setIntegerParam(addr, ADStatus, ADStatusIdle);
         callParamCallbacks(addr, addr);
 
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
         return (AdscStatus_t)status;
     } else if (status != AdscStatusOk) {
         return (AdscStatus_t)status;
     }
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status = setIntegerParam(addr, ADStatus, ADStatusIdle);
     status |= callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == asynSuccess) return AdscStatusOk;
 
@@ -1550,21 +1550,21 @@ AdscStatus_t adsc::waitForDetectorState(int desiredState, double timeout,
     assert(status == epicsTimeOK);
     previousState = -1;
     for (;;) {
-        epicsMutexMustLock(this->mutexId);
+        this->lock();
         state = CCDState();
-        epicsMutexUnlock(this->mutexId);
+        this->unlock();
 
         if (desiredState == state) break;
 
         if (state != previousState) {
             previousState = state;
 
-            epicsMutexMustLock(this->mutexId);
+            this->lock();
 
             setIntegerParam(addr, AdscState, state);
             callParamCallbacks(addr, addr);
 
-            epicsMutexUnlock(this->mutexId);
+            this->unlock();
         }
 
         if (state == DTC_STATE_RETRY) {
@@ -1599,12 +1599,12 @@ AdscStatus_t adsc::waitForDetectorState(int desiredState, double timeout,
         }
     }
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     setIntegerParam(addr, AdscState, state);
     callParamCallbacks(addr, addr);
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     return AdscStatusOk;
 }
@@ -1627,7 +1627,7 @@ AdscStatus_t adsc::imageAcquired()
     int fileNumber;
     int autoIncrement;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= getIntegerParam(addr, ADImageCounter, &imageCounter);
     status |= getIntegerParam(addr, ADFileNumber, &fileNumber);
@@ -1644,7 +1644,7 @@ AdscStatus_t adsc::imageAcquired()
         status |= callParamCallbacks(addr, addr);
     }
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     if (status == 0) return AdscStatusOk;
 
@@ -1689,7 +1689,7 @@ AdscStatus_t adsc::setBinModeInParams(int binMode)
 
     if (binMode < 1 || binMode > 2) return AdscStatusError;
 
-    epicsMutexMustLock(this->mutexId);
+    this->lock();
 
     status |= setIntegerParam(addr, ADBinX, binMode);
     status |= setIntegerParam(addr, ADBinY, binMode);
@@ -1700,7 +1700,7 @@ AdscStatus_t adsc::setBinModeInParams(int binMode)
     status |= setIntegerParam(addr, ADImageSize,
                               getImageSize(this->model, binMode));
 
-    epicsMutexUnlock(this->mutexId);
+    this->unlock();
 
     return status == 0 ? AdscStatusOk : AdscStatusError;
 }
