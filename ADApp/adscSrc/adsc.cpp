@@ -59,6 +59,7 @@ static const char *driverName = "drvAdsc";
 static int DriverConfiguredForOnePort = 0;
 static int AdscDetCtrlLibInitialized = 0;
 
+/** Status choices */
 typedef enum {
     AdscStatusOk,
     AdscStatusInterrupt,
@@ -67,6 +68,7 @@ typedef enum {
     AdscStatusError
 } AdscStatus_t;
 
+/** Trigger choices */
 typedef enum {
     AdscExternalTriggerControlStop,
     AdscExternalTriggerControlStart,
@@ -74,6 +76,7 @@ typedef enum {
     AdscExternalTriggerControlAgain
 } AdscExternalTriggerControl_t;
 
+/** Model choices */
 typedef enum {
     AdscQ4,
     AdscQ4r,
@@ -91,6 +94,7 @@ static const char *AdscModelStrings[] = {
 #define NUM_ADSC_MODELS ((int)(sizeof(AdscModelStrings) / \
     sizeof(AdscModelStrings[0])))
 
+/** ADSC sensor structure */
 typedef struct AdscSensor_t {
   int xSize;        /* number of pixels in X dimension    */
   int ySize;        /* number of pixels in Y dimension    */
@@ -115,10 +119,10 @@ static const char *AdscCcdStateStrings[] = {
 #define NUM_ADSC_CCD_STATES ((int)(sizeof(AdscCcdStateStrings) / \
     sizeof(AdscCcdStateStrings[0])))
 
+/** These parameters describe the trigger modes of this driver; they must
+  * agree with the values in the mbbo/mbbi records in the adsc.template
+  * database (or the ADBase.template database if the default is used) */
 typedef enum {
-    /* These parameters describe the trigger modes of this driver; they must
-     * agree with the values in the mbbo/mbbi records in the adsc.template
-     * database (or the ADBase.template database if the default is used) */
     AdscTriggerStartInternal,
     AdscTriggerStartExternal
 } AdscTriggerStartMode_t;
@@ -130,9 +134,7 @@ static const char *AdscTriggerStartStrings[] = {
 #define NUM_START_TRIGGER_MODES ((int)(sizeof(AdscTriggerStartStrings) / \
     sizeof(AdscTriggerStartStrings[0])))
 
-/* If we have any private driver commands, they begin with
- * ADFirstDriverCommand and should end with ADLastDriverCommand, which is used
- * for setting the size of the parameter library table */
+/** Driver-specific parameters for the ADSC driver */
 typedef enum {
     AdscReadCondition = ADFirstDriverParam,
     AdscState,
@@ -195,6 +197,8 @@ static asynParamString_t AdscParamString[] = {
 
 static void imageAcquisitionTaskC(void *drvPvt);
 
+/** Driver for ADSC detectors (Q4, Q4r, Q210, Q210r, Q270, Q315, Q315r).
+*/
 class adsc : public ADDriver {
 public:
     adsc(const char *portName, const char *modelName);
@@ -285,6 +289,11 @@ protected:
     epicsEventId lastImageEventId;
 };
 
+/** Called when asyn clients call pasynInt32->write().
+  * This function performs actions for some parameters, including ADAcquire, ADBinX, etc.
+  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
+  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
+  * \param[in] value Value to write. */
 asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
 {
     int function = pasynUser->reason;
@@ -493,6 +502,11 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
     return (asynStatus)status;
 }
 
+/** Called when asyn clients call pasynFloat64->write().
+  * This function performs actions for some parameters, including ADAcquireTime, AdscTwoTheta, etc.
+  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
+  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
+  * \param[in] value Value to write. */
 asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 {
     int function = pasynUser->reason;
@@ -568,6 +582,14 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     return (asynStatus)status;
 }
 
+/** Called when asyn clients call pasynOctet->write().
+  * This function performs actions for some parameters, including ADFilePath, etc.
+  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
+  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
+  * \param[in] value Value to write. 
+  * \param[in] nChars Number of characters to write 
+  * \param[out] nActual Number of characters actually written */
+  
 asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
                             size_t nChars, size_t *nActual)
 {
@@ -601,35 +623,36 @@ asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
     return (asynStatus)status;
 }
 
-asynStatus adsc::drvUserCreate(asynUser *pasynUser, const char *drvInfo,
-                               const char **pptypeName, size_t *psize)
+/** Sets pasynUser->reason to one of the enum values for the parameters defined for
+  * this class if the drvInfo field matches one the strings defined for it.
+  * If the parameter is not recognized by this class then calls ADDriver::drvUserCreate.
+  * Uses asynPortDriver::drvUserCreateParam.
+  * \param[in] pasynUser pasynUser structure that driver modifies
+  * \param[in] drvInfo String containing information about what driver function is being referenced
+  * \param[out] pptypeName Location in which driver puts a copy of drvInfo.
+  * \param[out] psize Location where driver puts size of param 
+  * \return Returns asynSuccess if a matching string was found, asynError if not found. */
+asynStatus adsc::drvUserCreate(asynUser *pasynUser,
+                                       const char *drvInfo, 
+                                       const char **pptypeName, size_t *psize)
 {
-    int status = asynSuccess;
-    int param;
-    const char *functionName = "drvUserCreate";
+    asynStatus status;
+    //const char *functionName = "drvUserCreate";
+    
+    status = this->drvUserCreateParam(pasynUser, drvInfo, pptypeName, psize, 
+                                      AdscParamString, NUM_ADSC_PARAMS);
 
-    /* See if this is one of this drivers' parameters */
-    status = findParam(AdscParamString, NUM_ADSC_PARAMS, drvInfo, &param);
-    if (status == asynSuccess) {
-        pasynUser->reason = param;
-        if (pptypeName) {
-            *pptypeName = epicsStrDup(drvInfo);
-        }
-        if (psize) {
-            *psize = sizeof(param);
-        }
-        asynPrint(pasynUser, ASYN_TRACE_FLOW,
-                  "%s:%s: drvInfo=%s, param=%d\n",
-                  driverName, functionName, drvInfo, param);
-        return asynSuccess;
-    }
-
-    /* This was not one of our driver parameters, call base class method */
-    status = ADDriver::drvUserCreate(pasynUser, drvInfo, pptypeName, psize);
-
-    return (asynStatus)status;
+    /* If not, then call the base class method, see if it is known there */
+    if (status) status = ADDriver::drvUserCreate(pasynUser, drvInfo, pptypeName, psize);
+    return(status);
 }
 
+/** Report status of the driver.
+  * Prints details about the driver if details>0.
+  * It then calls the ADDriver::report() method.
+  * \param[in] fp File pointed passed by caller where the output is written to.
+  * \param[in] details If >0 then driver details are printed.
+  */
 void adsc::report(FILE *fp, int details)
 {
     fprintf(fp, "ADSC detector %s\n", this->portName);
@@ -659,6 +682,13 @@ extern "C" int adscConfig(const char *portName, const char *modelName)
     return asynSuccess;
 }
 
+/** Constructor for ADSC driver; most parameters are simply passed to ADDriver::ADDriver.
+  * After calling the base class constructor this method creates a thread to collect the detector data, 
+  * and sets reasonable default values the parameters defined in this class and ADStdDriverParams.h.
+  * \param[in] portName The name of the asyn port driver to be created.
+  * \param[in] modelName The model name of the detector being used; choices are
+  *            "Q4","Q4r","Q210","Q210r","Q270","Q315","Q315r"
+  */
 adsc::adsc(const char *portName, const char *modelName)
     : ADDriver(portName, 1, ADLastDriverParam, 
                0, 0,             /* maxBuffers and maxMemory are 0 because we don't support NDArray callbacks yet */
