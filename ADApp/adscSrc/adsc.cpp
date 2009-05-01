@@ -136,7 +136,7 @@ static const char *AdscTriggerStartStrings[] = {
 
 /** Driver-specific parameters for the ADSC driver */
 typedef enum {
-    AdscReadCondition = ADFirstDriverParam,
+    AdscReadCondition = ADLastStdParam,
     AdscState,
     AdscStatus,
     AdscLastError,
@@ -381,26 +381,26 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
                 epicsEventSignal(this->stopTriggerEventId);
             }
             break;
-        case ADImageCounter:
+        case NDArrayCounter:
             if (value < 0) {
                 status = asynError;
                 break;
             }
-            status |= setIntegerParam(addr, ADImageCounter, value);
+            status |= setIntegerParam(addr, NDArrayCounter, value);
             break;
-        case ADFileNumber:
+        case NDFileNumber:
             if (value < 0) {
                 status = asynError;
                 break;
             }
-            status |= setIntegerParam(addr, ADFileNumber, value);
+            status |= setIntegerParam(addr, NDFileNumber, value);
             break;
-        case ADAutoIncrement:
+        case NDAutoIncrement:
             if (value != 0 && value != 1) {
                 status = asynError;
                 break;
             }
-            status |= setIntegerParam(addr, ADAutoIncrement, value);
+            status |= setIntegerParam(addr, NDAutoIncrement, value);
             break;
         case AdscReadCondition:
             status |= readDetectorCondition();
@@ -583,7 +583,7 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 }
 
 /** Called when asyn clients call pasynOctet->write().
-  * This function performs actions for some parameters, including ADFilePath, etc.
+  * This function performs actions for some parameters, including NDFilePath, etc.
   * For all parameters it sets the value in the parameter library and calls any registered callbacks..
   * \param[in] pasynUser pasynUser structure that encodes the reason and address.
   * \param[in] value Value to write. 
@@ -599,9 +599,9 @@ asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
     const char *functionName = "writeOctet";
 
     switch (function) {
-        case ADFilePath:
-        case ADFileName:
-        case ADFileTemplate:
+        case NDFilePath:
+        case NDFileName:
+        case NDFileTemplate:
             status |= setStringParam(addr, function, (char *)value);
             break;
         default:
@@ -752,8 +752,8 @@ adsc::adsc(const char *portName, const char *modelName)
     }
 
     /* Set driver specific defaults */
-    status |= setStringParam(addr, ADManufacturer, "ADSC");
-    status |= setStringParam(addr, ADModel, AdscModelStrings[this->model]);
+    status |= setStringParam (addr, ADManufacturer, "ADSC");
+    status |= setStringParam (addr, ADModel, AdscModelStrings[this->model]);
     status |= setIntegerParam(addr, ADSizeX, AdscSensors[this->model].xSize);
     status |= setIntegerParam(addr, ADSizeY, AdscSensors[this->model].ySize);
     status |= setIntegerParam(addr, ADMaxSizeX,
@@ -761,10 +761,10 @@ adsc::adsc(const char *portName, const char *modelName)
     status |= setIntegerParam(addr, ADMaxSizeY,
                               AdscSensors[this->model].ySize);
     status |= setBinModeInParams(1);
-    status |= setIntegerParam(addr, ADDataType, NDUInt16);
-    status |= setIntegerParam(addr, ADAutoSave, 1);
-    status |= setDoubleParam(addr, ADAcquireTime, 1.0);
-    status |= setDoubleParam(addr, ADAcquirePeriod, 0.0);
+    status |= setIntegerParam(addr, NDDataType, NDUInt16);
+    status |= setIntegerParam(addr, NDAutoSave, 1);
+    status |= setDoubleParam (addr, ADAcquireTime, 1.0);
+    status |= setDoubleParam (addr, ADAcquirePeriod, 0.0);
     status |= setIntegerParam(addr, ADNumImages, 1);
     status |= setIntegerParam(addr, ADImageMode, ADImageSingle);
     status |= setIntegerParam(addr, AdscReadCondition, 0);
@@ -1199,11 +1199,11 @@ AdscStatus_t adsc::createFileNameNoIncrement(char *dst, size_t dstSize)
 
     this->lock();
 
-    status = getIntegerParam(addr, ADAutoIncrement, &autoIncrement);
+    status = getIntegerParam(addr, NDAutoIncrement, &autoIncrement);
     if (status == 0) {
-        status |= setIntegerParam(addr, ADAutoIncrement, 0);
+        status |= setIntegerParam(addr, NDAutoIncrement, 0);
         status |= createFileName(dstSize, dst);
-        status |= setIntegerParam(addr, ADAutoIncrement, autoIncrement);
+        status |= setIntegerParam(addr, NDAutoIncrement, autoIncrement);
     }
 
     this->unlock();
@@ -1659,17 +1659,17 @@ AdscStatus_t adsc::imageAcquired()
 
     this->lock();
 
-    status |= getIntegerParam(addr, ADImageCounter, &imageCounter);
-    status |= getIntegerParam(addr, ADFileNumber, &fileNumber);
-    status |= getIntegerParam(addr, ADAutoIncrement, &autoIncrement);
+    status |= getIntegerParam(addr, NDArrayCounter, &imageCounter);
+    status |= getIntegerParam(addr, NDFileNumber, &fileNumber);
+    status |= getIntegerParam(addr, NDAutoIncrement, &autoIncrement);
     if (status == 0) {
         imageCounter++;
-        status |= setIntegerParam(addr, ADImageCounter, imageCounter);
+        status |= setIntegerParam(addr, NDArrayCounter, imageCounter);
         if (autoIncrement) {
             fileNumber++;
-            status |= setIntegerParam(addr, ADFileNumber, fileNumber);
+            status |= setIntegerParam(addr, NDFileNumber, fileNumber);
         }
-        status |= setStringParam(addr, ADFullFileName,
+        status |= setStringParam(addr, NDFullFileName,
                                  this->perImageFullFileName);
         status |= callParamCallbacks(addr, addr);
     }
@@ -1723,11 +1723,11 @@ AdscStatus_t adsc::setBinModeInParams(int binMode)
 
     status |= setIntegerParam(addr, ADBinX, binMode);
     status |= setIntegerParam(addr, ADBinY, binMode);
-    status |= setIntegerParam(addr, ADImageSizeX,
+    status |= setIntegerParam(addr, NDArraySizeX,
                               getImageSizeX(this->model, binMode));
-    status |= setIntegerParam(addr, ADImageSizeY,
+    status |= setIntegerParam(addr, NDArraySizeY,
                               getImageSizeY(this->model, binMode));
-    status |= setIntegerParam(addr, ADImageSize,
+    status |= setIntegerParam(addr, NDArraySize,
                               getImageSize(this->model, binMode));
 
     this->unlock();
