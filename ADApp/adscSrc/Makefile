@@ -60,7 +60,6 @@ ifeq (YES, $(USE_SIMADSC))
 endif
 
 LIB_SRCS += adsc.cpp
-LIB_SRCS += drvAdscEpics.c
 ifeq (YES, $(USE_SIMADSC))
   LIB_SRCS += simadsc.c
 endif
@@ -97,6 +96,7 @@ adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 PROD_SYS_LIBS_cygwin32 += rpc
+PROD_SYS_LIBS += tiff jpeg z
 
 #=============================
 

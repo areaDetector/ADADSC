@@ -31,11 +31,10 @@
 #include <epicsStdio.h>
 #include <epicsMutex.h>
 #include <cantProceed.h>
+#include <iocsh.h>
+#include <epicsExport.h>
 
-#include "ADStdDriverParams.h"
 #include "ADDriver.h"
-
-#include "drvAdsc.h"
 
 extern "C" {
 #include <detcon_entry.h>
@@ -1734,3 +1733,21 @@ AdscStatus_t adsc::setBinModeInParams(int binMode)
 
     return status == 0 ? AdscStatusOk : AdscStatusError;
 }
+
+/* Code for iocsh registration */
+static const iocshArg adscConfigArg0  = {"Port name", iocshArgString};
+static const iocshArg adscConfigArg1  = {"Model name", iocshArgString};
+static const iocshArg * const adscConfigArgs[2] = {&adscConfigArg0,
+                                                   &adscConfigArg1};
+static const iocshFuncDef configadsc = {"adscConfig", 2, adscConfigArgs};
+static void configadscCallFunc(const iocshArgBuf *args)
+{
+    adscConfig(args[0].sval, args[1].sval);
+}
+
+static void adscRegister(void)
+{
+    iocshRegister(&configadsc, configadscCallFunc);
+}
+
+epicsExportRegistrar(adscRegister);
