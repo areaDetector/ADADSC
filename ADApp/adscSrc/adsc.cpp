@@ -1750,4 +1750,6 @@ static void adscRegister(void)
     iocshRegister(&configadsc, configadscCallFunc);
 }
 
+extern "C" {
 epicsExportRegistrar(adscRegister);
+}
