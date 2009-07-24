@@ -95,8 +95,9 @@ adscApp_LIBS += busy sscan autosave
 adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
+PROD_LIBS_cygwin32 += libtiff jpeg
+PROD_SYS_LIBS_DEFAULT += tiff jpeg z
 PROD_SYS_LIBS_cygwin32 += rpc
-PROD_SYS_LIBS += tiff jpeg z
 
 #=============================
 
