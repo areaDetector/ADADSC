@@ -484,6 +484,8 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
             #endif
             break;
         default:
+            /* If this is not a parameter we have handled call the base class */
+            if (function < ADLastStdParam) status = ADDriver::writeInt32(pasynUser, value);
             break;
     }
 
@@ -564,6 +566,8 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
             status |= setDoubleParam(addr, AdscKappa, value);
             break;
         default:
+            /* If this is not a parameter we have handled call the base class */
+            if (function < ADLastStdParam) status = ADDriver::writeFloat64(pasynUser, value);
             break;
     }
 
@@ -604,6 +608,8 @@ asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
             status |= setStringParam(addr, function, (char *)value);
             break;
         default:
+            /* If this is not a parameter we have handled call the base class */
+            if (function < ADLastStdParam) status = ADDriver::writeOctet(pasynUser, value, nChars, nActual);
             break;
     }
 
