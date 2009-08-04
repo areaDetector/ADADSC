@@ -1,5 +1,4 @@
-/* adsc.cpp
- *
+/*
  * This is a driver for ADSC detectors (Q4, Q4r, Q210, Q210r, Q270, Q315,
  * Q315r).
  *
@@ -12,7 +11,6 @@
  *         University of Chicago
  *
  * Created: April 11, 2008
- *
  */
 
 #include <stddef.h>
@@ -69,11 +67,11 @@ typedef enum {
 
 /** Trigger choices */
 typedef enum {
-    AdscExternalTriggerControlStop,
-    AdscExternalTriggerControlStart,
-    AdscExternalTriggerControlOk,
-    AdscExternalTriggerControlAgain
-} AdscExternalTriggerControl_t;
+    AdscExternSwTriggerControlStop,
+    AdscExternSwTriggerControlStart,
+    AdscExternSwTriggerControlOk,
+    AdscExternSwTriggerControlAgain
+} AdscExternSwTriggerControl_t;
 
 /** Model choices */
 typedef enum {
@@ -123,11 +121,11 @@ static const char *AdscCcdStateStrings[] = {
   * database (or the ADBase.template database if the default is used) */
 typedef enum {
     AdscTriggerStartInternal,
-    AdscTriggerStartExternal
+    AdscTriggerStartExternSw
 } AdscTriggerStartMode_t;
 
 static const char *AdscTriggerStartStrings[] = {
-    "Internal","External"
+    "Internal","Ext. Software"
 };
 
 #define NUM_START_TRIGGER_MODES ((int)(sizeof(AdscTriggerStartStrings) / \
@@ -142,7 +140,7 @@ typedef enum {
     AdscSoftwareReset,
     AdscLastImage,
     AdscOkToExpose,
-    AdscExternalTriggerControl,
+    AdscExternSwTriggerControl,
     AdscReuseDarks,
     AdscDezinger,
     AdscAdc,
@@ -171,7 +169,7 @@ static asynParamString_t AdscParamString[] = {
     { AdscSoftwareReset,          "ADSC_SOFTWARE_RESET" },
     { AdscLastImage,              "ADSC_LAST_IMAGE" },
     { AdscOkToExpose,             "ADSC_OK_TO_EXPOSE" },
-    { AdscExternalTriggerControl, "ADSC_EXTERNAL_TRIGGER_CTRL" },
+    { AdscExternSwTriggerControl, "ADSC_EXTERN_SW_TRIGGER_CTRL" },
     { AdscReuseDarks,             "ADSC_REUSE_DARKS" },
     { AdscDezinger,               "ADSC_DEZINGER" },
     { AdscAdc,                    "ADSC_ADC" },
@@ -231,7 +229,7 @@ protected:
     AdscStatus_t setBinModeInParams(int binMode);
     void setLastDarksParameters(double exposureTime, int adc, int bin);
     AdscStatus_t setOkToExpose(int isEnabled);
-    AdscStatus_t setExternalTriggerControl(AdscExternalTriggerControl_t
+    AdscStatus_t setExternSwTriggerControl(AdscExternSwTriggerControl_t
                                            value);
     int shouldTakeDarks();
     AdscStatus_t startExposure();
@@ -289,10 +287,12 @@ protected:
 };
 
 /** Called when asyn clients call pasynInt32->write().
-  * This function performs actions for some parameters, including ADAcquire, ADBinX, etc.
-  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
-  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
-  * \param[in] value Value to write. */
+  * This function performs actions for some parameters, including ADAcquire,
+  * ADBinX, etc. For all parameters it sets the value in the parameter library
+  * and calls any registered callbacks.
+  * \param[in] pasynUser pasynUser structure that encodes the reason and
+  *                      address
+  * \param[in] value Value to write */
 asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
 {
     int function = pasynUser->reason;
@@ -414,18 +414,18 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
             if (status != 0 || acquire == 0) break;
             epicsEventSignal(this->lastImageEventId);
             break;
-        case AdscExternalTriggerControl:
+        case AdscExternSwTriggerControl:
             if (value < 0 || value > 3) {
                 status = asynError;
                 break;
             }
             status |= getIntegerParam(addr, ADAcquire, &acquire);
             if (status != 0 || acquire == 0) break;
-            status |= setIntegerParam(addr, AdscExternalTriggerControl,
+            status |= setIntegerParam(addr, AdscExternSwTriggerControl,
                                       value);
-            if (value == AdscExternalTriggerControlStart)
+            if (value == AdscExternSwTriggerControlStart)
                 epicsEventSignal(this->startTriggerEventId);
-            else if (value == AdscExternalTriggerControlStop)
+            else if (value == AdscExternSwTriggerControlStop)
                 epicsEventSignal(this->stopTriggerEventId);
             break;
         case AdscReuseDarks:
@@ -484,8 +484,10 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
             #endif
             break;
         default:
-            /* If this is not a parameter we have handled call the base class */
-            if (function < ADLastStdParam) status = ADDriver::writeInt32(pasynUser, value);
+            /* If this is not a parameter we have handled, call the base
+             * class */
+            if (function < ADLastStdParam)
+                status = ADDriver::writeInt32(pasynUser, value);
             break;
     }
 
@@ -504,10 +506,12 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
 }
 
 /** Called when asyn clients call pasynFloat64->write().
-  * This function performs actions for some parameters, including ADAcquireTime, AdscTwoTheta, etc.
-  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
-  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
-  * \param[in] value Value to write. */
+  * This function performs actions for some parameters, including
+  * ADAcquireTime, AdscTwoTheta, etc. For all parameters it sets the value in
+  * the parameter library and calls any registered callbacks.
+  * \param[in] pasynUser pasynUser structure that encodes the reason and
+  *                      address
+  * \param[in] value Value to write */
 asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 {
     int function = pasynUser->reason;
@@ -566,8 +570,10 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
             status |= setDoubleParam(addr, AdscKappa, value);
             break;
         default:
-            /* If this is not a parameter we have handled call the base class */
-            if (function < ADLastStdParam) status = ADDriver::writeFloat64(pasynUser, value);
+            /* If this is not a parameter we have handled, call the base
+             * class */
+            if (function < ADLastStdParam)
+                status = ADDriver::writeFloat64(pasynUser, value);
             break;
     }
 
@@ -586,13 +592,14 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 }
 
 /** Called when asyn clients call pasynOctet->write().
-  * This function performs actions for some parameters, including NDFilePath, etc.
-  * For all parameters it sets the value in the parameter library and calls any registered callbacks..
-  * \param[in] pasynUser pasynUser structure that encodes the reason and address.
-  * \param[in] value Value to write. 
-  * \param[in] nChars Number of characters to write 
+  * This function performs actions for some parameters, including NDFilePath,
+  * etc. For all parameters it sets the value in the parameter library and
+  * calls any registered callbacks.
+  * \param[in] pasynUser pasynUser structure that encodes the reason and
+  *                      address
+  * \param[in] value Value to write
+  * \param[in] nChars Number of characters to write
   * \param[out] nActual Number of characters actually written */
-  
 asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
                             size_t nChars, size_t *nActual)
 {
@@ -608,8 +615,11 @@ asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
             status |= setStringParam(addr, function, (char *)value);
             break;
         default:
-            /* If this is not a parameter we have handled call the base class */
-            if (function < ADLastStdParam) status = ADDriver::writeOctet(pasynUser, value, nChars, nActual);
+            /* If this is not a parameter we have handled, call the base
+             * class */
+            if (function < ADLastStdParam)
+                status = ADDriver::writeOctet(pasynUser, value, nChars,
+                                              nActual);
             break;
     }
 
@@ -628,35 +638,40 @@ asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
     return (asynStatus)status;
 }
 
-/** Sets pasynUser->reason to one of the enum values for the parameters defined for
-  * this class if the drvInfo field matches one the strings defined for it.
-  * If the parameter is not recognized by this class then calls ADDriver::drvUserCreate.
+/** Sets pasynUser->reason to one of the enum values for the parameters
+  * defined for this class if the drvInfo field matches one the strings
+  * defined for it.
+  * If the parameter is not recognized by this class then calls
+  * ADDriver::drvUserCreate.
   * Uses asynPortDriver::drvUserCreateParam.
   * \param[in] pasynUser pasynUser structure that driver modifies
-  * \param[in] drvInfo String containing information about what driver function is being referenced
-  * \param[out] pptypeName Location in which driver puts a copy of drvInfo.
-  * \param[out] psize Location where driver puts size of param 
-  * \return Returns asynSuccess if a matching string was found, asynError if not found. */
+  * \param[in] drvInfo String containing information about what driver
+  *                    function is being referenced
+  * \param[out] pptypeName Location in which driver puts a copy of drvInfo
+  * \param[out] psize Location where driver puts size of param
+  * \return asynSuccess if a matching string was found, asynError if not found
+  */
 asynStatus adsc::drvUserCreate(asynUser *pasynUser,
-                                       const char *drvInfo, 
+                                       const char *drvInfo,
                                        const char **pptypeName, size_t *psize)
 {
     asynStatus status;
-    //const char *functionName = "drvUserCreate";
-    
-    status = this->drvUserCreateParam(pasynUser, drvInfo, pptypeName, psize, 
+
+    status = this->drvUserCreateParam(pasynUser, drvInfo, pptypeName, psize,
                                       AdscParamString, NUM_ADSC_PARAMS);
 
     /* If not, then call the base class method, see if it is known there */
-    if (status) status = ADDriver::drvUserCreate(pasynUser, drvInfo, pptypeName, psize);
+    if (status)
+        status = ADDriver::drvUserCreate(pasynUser, drvInfo, pptypeName,
+                                         psize);
     return(status);
 }
 
 /** Report status of the driver.
   * Prints details about the driver if details>0.
   * It then calls the ADDriver::report() method.
-  * \param[in] fp File pointed passed by caller where the output is written to.
-  * \param[in] details If >0 then driver details are printed.
+  * \param[in] fp File pointed passed by caller where the output is written to
+  * \param[in] details If >0 then driver details are printed
   */
 void adsc::report(FILE *fp, int details)
 {
@@ -687,19 +702,25 @@ extern "C" int adscConfig(const char *portName, const char *modelName)
     return asynSuccess;
 }
 
-/** Constructor for ADSC driver; most parameters are simply passed to ADDriver::ADDriver.
-  * After calling the base class constructor this method creates a thread to collect the detector data, 
-  * and sets reasonable default values the parameters defined in this class and ADStdDriverParams.h.
-  * \param[in] portName The name of the asyn port driver to be created.
-  * \param[in] modelName The model name of the detector being used; choices are
-  *            "Q4","Q4r","Q210","Q210r","Q270","Q315","Q315r"
+/** Constructor for ADSC driver; most parameters are simply passed to
+  * ADDriver::ADDriver.
+  * After calling the base class constructor, this method creates a thread to
+  * collect the detector data and sets reasonable default values for the
+  * parameters defined in this class and ADStdDriverParams.h.
+  * \param[in] portName The name of the asyn port driver to be created
+  * \param[in] modelName The model name of the detector being used; choices
+  *            are "Q4", "Q4r", "Q210", "Q210r", "Q270", "Q315", or "Q315r"
   */
 adsc::adsc(const char *portName, const char *modelName)
-    : ADDriver(portName, 1, ADLastDriverParam, 
-               0, 0,             /* maxBuffers and maxMemory are 0 because we don't support NDArray callbacks yet */
-               0, 0,             /* No interfaces beyond those set in ADDriver.cpp */
-               ASYN_CANBLOCK, 1, /* ASYN_CANBLOCK=1, ASYN_MULTIDEVICE=0, autoConnect=1 */
-               0, 0)             /* priority and stackSize=0, so use defaults */
+    : ADDriver(portName, 1, ADLastDriverParam,
+               0, 0,             /* maxBuffers and maxMemory are 0 because we
+                                  * don't support NDArray callbacks yet */
+               0, 0,             /* No interfaces beyond those set in
+                                  * ADDriver.cpp */
+               ASYN_CANBLOCK, 1, /* ASYN_CANBLOCK=1, ASYN_MULTIDEVICE=0,
+                                  * autoConnect=1 */
+               0, 0)             /* priority and stackSize=0, so use
+                                  * defaults */
 {
     int status = asynSuccess;
     const char *functionName = "adscConfig";
@@ -776,8 +797,8 @@ adsc::adsc(const char *portName, const char *modelName)
     status |= setIntegerParam(addr, AdscSoftwareReset, 0);
     status |= setIntegerParam(addr, AdscLastImage, 0);
     status |= setIntegerParam(addr, AdscOkToExpose, 0);
-    status |= setIntegerParam(addr, AdscExternalTriggerControl,
-                              AdscExternalTriggerControlOk);
+    status |= setIntegerParam(addr, AdscExternSwTriggerControl,
+                              AdscExternSwTriggerControlOk);
     status |= setIntegerParam(addr, AdscReuseDarks, 1);
     status |= setIntegerParam(addr, AdscDezinger, 0);
     status |= setIntegerParam(addr, AdscAdc, 1);
@@ -863,8 +884,9 @@ AdscStatus_t adsc::readDetectorCondition()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:readDetectorCondition "
-              "error, status=%d\n", driverName, status);
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+              "%s:readDetectorCondition error, status=%d\n", driverName,
+              status);
     return AdscStatusError;
 }
 
@@ -888,8 +910,9 @@ AdscStatus_t adsc::writeDetectorParametersBeforeDataset()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
-              "error, status=%d\n", driverName, status);
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+              "%s:writeDetectorParameters error, status=%d\n", driverName,
+              status);
     return AdscStatusError;
 }
 
@@ -923,8 +946,9 @@ AdscStatus_t adsc::writeDetectorParametersBeforeImage()
 
     if (status == 0) return AdscStatusOk;
 
-    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:writeDetectorParameters "
-              "error, status=%d\n", driverName, status);
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+              "%s:writeDetectorParameters error, status=%d\n", driverName,
+              status);
     return AdscStatusError;
 }
 
@@ -1088,7 +1112,7 @@ AdscStatus_t adsc::acquireImages()
     numConsecutiveRetries = 0;
     for (i = 0; this->perDatasetImageMode == ADImageContinuous ||
             i < this->perDatasetNumImages;) {
-        if (this->perDatasetTriggerMode == AdscTriggerStartExternal) {
+        if (this->perDatasetTriggerMode == AdscTriggerStartExternSw) {
             status = setOkToExpose(1);
             if (status != AdscStatusOk) return AdscStatusError;
             status = waitForExternalTrigger(this->startTriggerEventId);
@@ -1109,9 +1133,9 @@ AdscStatus_t adsc::acquireImages()
                            i == this->perDatasetNumImages - 1 ? 1 : 0,
                            this->perDatasetTriggerMode);
         if (status == AdscStatusAgain) {
-            if (this->perDatasetTriggerMode == AdscTriggerStartExternal) {
-                status = setExternalTriggerControl(
-                                             AdscExternalTriggerControlAgain);
+            if (this->perDatasetTriggerMode == AdscTriggerStartExternSw) {
+                status = setExternSwTriggerControl(
+                                             AdscExternSwTriggerControlAgain);
                 if (status != AdscStatusOk) return (AdscStatus_t)status;
             } else {
                 numConsecutiveRetries++;
@@ -1125,9 +1149,9 @@ AdscStatus_t adsc::acquireImages()
             }
             continue;
         } else if (status == AdscStatusOk) {
-            if (this->perDatasetTriggerMode == AdscTriggerStartExternal) {
-                status = setExternalTriggerControl(
-                                                AdscExternalTriggerControlOk);
+            if (this->perDatasetTriggerMode == AdscTriggerStartExternSw) {
+                status = setExternSwTriggerControl(
+                                                AdscExternSwTriggerControlOk);
                 if (status != AdscStatusOk) return (AdscStatus_t)status;
             } else {
                 numConsecutiveRetries = 0;
@@ -1236,12 +1260,13 @@ AdscStatus_t adsc::setOkToExpose(int isEnabled)
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:setOkToExpose error, "
-              "failed to set AdscOkToExpose or call callbacks\n", driverName);
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+              "%s:setOkToExpose error, failed to set AdscOkToExpose or call "
+              "callbacks\n", driverName);
     return AdscStatusError;
 }
 
-AdscStatus_t adsc::setExternalTriggerControl(AdscExternalTriggerControl_t
+AdscStatus_t adsc::setExternSwTriggerControl(AdscExternSwTriggerControl_t
                                              value)
 {
     int status;
@@ -1249,7 +1274,7 @@ AdscStatus_t adsc::setExternalTriggerControl(AdscExternalTriggerControl_t
 
     this->lock();
 
-    status = setIntegerParam(addr, AdscExternalTriggerControl, value);
+    status = setIntegerParam(addr, AdscExternSwTriggerControl, value);
     status |= callParamCallbacks(addr, addr);
 
     this->unlock();
@@ -1257,8 +1282,8 @@ AdscStatus_t adsc::setExternalTriggerControl(AdscExternalTriggerControl_t
     if (status == asynSuccess) return AdscStatusOk;
 
     asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-              "%s:setExternalTriggerControl error, failed to set "
-              "AdscExternalTriggerControl or call callbacks\n", driverName);
+              "%s:setExternSwTriggerControl error, failed to set "
+              "AdscExternSwTriggerControl or call callbacks\n", driverName);
     return AdscStatusError;
 }
 
@@ -1297,8 +1322,9 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
     this->unlock();
 
     if (status != 0) {
-        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks error, "
-                  "CCDSetFilePar for FLP_TIME failed\n", driverName);
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                  "%s:takeDarks error, CCDSetFilePar for FLP_TIME failed\n",
+                  driverName);
         return AdscStatusError;
     }
 
@@ -1324,10 +1350,10 @@ AdscStatus_t adsc::takeDarks(const char *destDir)
         if (status == AdscStatusAgain) {
             numRetries++;
             if (numRetries > 3) {
-                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeDarks "
-                          "error, takeImage returned AdscStatusAgain more "
-                          "than 3 times while trying to take darks\n",
-                          driverName);
+                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                          "%s:takeDarks error, takeImage returned "
+                          "AdscStatusAgain more than 3 times while trying to "
+                          "take darks\n", driverName);
                 return AdscStatusError;
             }
             continue;
@@ -1361,23 +1387,26 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
     fexposureTime = (float)this->perDatasetExposureTime;
     status = CCDSetFilePar(FLP_TIME, (char *)&fexposureTime);
     if (status != 0) {
-        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
-                  "CCDSetFilePar for FLP_TIME failed\n", driverName);
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                  "%s:takeImage error, CCDSetFilePar for FLP_TIME failed\n",
+                  driverName);
         this->unlock();
         return AdscStatusError;
     }
     status = CCDSetFilePar(FLP_KIND, (char *)&imageKind);
     if (status != 0) {
-        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
-                  "CCDSetFilePar for FLP_KIND failed\n", driverName);
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                  "%s:takeImage error, CCDSetFilePar for FLP_KIND failed\n",
+                  driverName);
         this->unlock();
         return AdscStatusError;
     }
     status = CCDSetFilePar(FLP_FILENAME, strlen(fullFileName) == 0 ?
                            "_null_" : fullFileName);
     if (status != 0) {
-        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage error, "
-                  "CCDSetFilePar for FLP_FILENAME failed\n", driverName);
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                  "%s:takeImage error, CCDSetFilePar for FLP_FILENAME "
+                  "failed\n", driverName);
         this->unlock();
         return AdscStatusError;
     }
@@ -1401,7 +1430,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
      * areaDetector base so the behavior has not been implemented here. */
 
     wasAborted = 0;
-    if (triggerMode == AdscTriggerStartExternal) {
+    if (triggerMode == AdscTriggerStartExternSw) {
         status = waitForExternalTrigger(this->stopTriggerEventId);
         if (status == AdscStatusInterrupt) wasAborted = 1;
     } else {
@@ -1423,7 +1452,7 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
 
     status2 = stopExposure();
 
-    if (triggerMode == AdscTriggerStartExternal) {
+    if (triggerMode == AdscTriggerStartExternSw) {
         if (status != AdscStatusOk) {
             this->lock();
             CCDAbort();
@@ -1438,9 +1467,9 @@ AdscStatus_t adsc::takeImage(const char *fullFileName, int imageKind,
             if (status == epicsEventWaitOK) {
                 return AdscStatusInterrupt;
             } else {
-                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:takeImage "
-                          "error, epicsEventWaitWithTimeout returned "
-                          "status=%d\n", driverName, status);
+                asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                          "%s:takeImage error, epicsEventWaitWithTimeout "
+                          "returned status=%d\n", driverName, status);
                 return AdscStatusError;
             }
         }
@@ -1523,8 +1552,9 @@ AdscStatus_t adsc::startExposure()
 
     if (status == asynSuccess) return AdscStatusOk;
 
-    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:startExposure error, "
-              "setting ADStatus or calling callbacks failed\n", driverName);
+    asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+              "%s:startExposure error, setting ADStatus or calling callbacks "
+              "failed\n", driverName);
     return AdscStatusError;
 }
 
@@ -1537,9 +1567,9 @@ AdscStatus_t adsc::stopExposure()
     status = CCDStopExposure();
     this->unlock();
     if (status != 0) {
-        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR, "%s:stopExposure error, "
-                  "CCDStopExposure failed with return status=%d\n",
-                  driverName, status);
+        asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                  "%s:stopExposure error, CCDStopExposure failed with return "
+                  "status=%d\n", driverName, status);
         return AdscStatusError;
     }
 
