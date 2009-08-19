@@ -706,7 +706,7 @@ extern "C" int adscConfig(const char *portName, const char *modelName)
   * ADDriver::ADDriver.
   * After calling the base class constructor, this method creates a thread to
   * collect the detector data and sets reasonable default values for the
-  * parameters defined in this class and ADStdDriverParams.h.
+  * parameters defined in this class, asynNDArrayDriver and ADDriver.
   * \param[in] portName The name of the asyn port driver to be created
   * \param[in] modelName The model name of the detector being used; choices
   *            are "Q4", "Q4r", "Q210", "Q210r", "Q270", "Q315", or "Q315r"
