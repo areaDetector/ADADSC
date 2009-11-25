@@ -132,65 +132,32 @@ static const char *AdscTriggerStartStrings[] = {
     sizeof(AdscTriggerStartStrings[0])))
 
 /** Driver-specific parameters for the ADSC driver */
-typedef enum {
-    AdscReadCondition = ADLastStdParam,
-    AdscState,
-    AdscStatus,
-    AdscLastError,
-    AdscSoftwareReset,
-    AdscLastImage,
-    AdscOkToExpose,
-    AdscExternSwTriggerControl,
-    AdscReuseDarks,
-    AdscDezinger,
-    AdscAdc,
-    AdscRaw,
-    AdscImageTransform,
-    AdscStoredDarks,
-    AdscBeamCenterX,
-    AdscBeamCenterY,
-    AdscDistance,
-    AdscTwoTheta,
-    AdscAxis,
-    AdscWavelength,
-    AdscImageWidth,
-    AdscPhi,
-    AdscOmega,
-    AdscKappa,
-    AdscPrivateStopExpRetryCnt, /* only for testing with simadsc */
-    ADLastDriverParam
-} AdscParam_t;
+#define AdscReadConditionString          "ADSC_READ_CONDITION"
+#define AdscStateString                  "ADSC_STATE"
+#define AdscStatusString                 "ADSC_STATUS"
+#define AdscLastErrorString              "ADSC_LAST_ERROR"
+#define AdscSoftwareResetString          "ADSC_SOFTWARE_RESET"
+#define AdscLastImageString              "ADSC_LAST_IMAGE"
+#define AdscOkToExposeString             "ADSC_OK_TO_EXPOSE"
+#define AdscExternSwTriggerControlString "ADSC_EXTERN_SW_TRIGGER_CTRL"
+#define AdscReuseDarksString             "ADSC_REUSE_DARKS"
+#define AdscDezingerString               "ADSC_DEZINGER"
+#define AdscAdcString                    "ADSC_ADC"
+#define AdscRawString                    "ADSC_RAW"
+#define AdscImageTransformString         "ADSC_IMAGE_TRANSFORM"
+#define AdscStoredDarksString            "ADSC_STORED_DARKS"
+#define AdscBeamCenterXString            "ADSC_BEAM_CENTER_X"
+#define AdscBeamCenterYString            "ADSC_BEAM_CENTER_Y"
+#define AdscDistanceString               "ADSC_DISTANCE"
+#define AdscTwoThetaString               "ADSC_TWO_THETA"
+#define AdscAxisString                   "ADSC_AXIS"
+#define AdscWavelengthString             "ADSC_WAVELENGTH"
+#define AdscImageWidthString             "ADSC_IMAGE_WIDTH"
+#define AdscPhiString                    "ADSC_PHI"
+#define AdscOmegaString                  "ADSC_OMEGA"
+#define AdscPrivateStopExpRetryCntString "ADSC_PRVT_STOP_EXP_RTRY_CNT"
+#define AdscKappaString                  "ADSC_KAPPA"
 
-static asynParamString_t AdscParamString[] = {
-    { AdscReadCondition,          "ADSC_READ_CONDITION" },
-    { AdscState,                  "ADSC_STATE" },
-    { AdscStatus,                 "ADSC_STATUS" },
-    { AdscLastError,              "ADSC_LAST_ERROR" },
-    { AdscSoftwareReset,          "ADSC_SOFTWARE_RESET" },
-    { AdscLastImage,              "ADSC_LAST_IMAGE" },
-    { AdscOkToExpose,             "ADSC_OK_TO_EXPOSE" },
-    { AdscExternSwTriggerControl, "ADSC_EXTERN_SW_TRIGGER_CTRL" },
-    { AdscReuseDarks,             "ADSC_REUSE_DARKS" },
-    { AdscDezinger,               "ADSC_DEZINGER" },
-    { AdscAdc,                    "ADSC_ADC" },
-    { AdscRaw,                    "ADSC_RAW" },
-    { AdscImageTransform,         "ADSC_IMAGE_TRANSFORM" },
-    { AdscStoredDarks,            "ADSC_STORED_DARKS" },
-    { AdscBeamCenterX,            "ADSC_BEAM_CENTER_X" },
-    { AdscBeamCenterY,            "ADSC_BEAM_CENTER_Y" },
-    { AdscDistance,               "ADSC_DISTANCE" },
-    { AdscTwoTheta,               "ADSC_TWO_THETA" },
-    { AdscAxis,                   "ADSC_AXIS" },
-    { AdscWavelength,             "ADSC_WAVELENGTH" },
-    { AdscImageWidth,             "ADSC_IMAGE_WIDTH" },
-    { AdscPhi,                    "ADSC_PHI" },
-    { AdscOmega,                  "ADSC_OMEGA" },
-    { AdscPrivateStopExpRetryCnt, "ADSC_PRVT_STOP_EXP_RTRY_CNT" },
-    { AdscKappa,                  "ADSC_KAPPA" }
-};
-
-#define NUM_ADSC_PARAMS ((int)(sizeof(AdscParamString) / \
-    sizeof(AdscParamString[0])))
 
 static void imageAcquisitionTaskC(void *drvPvt);
 
@@ -204,15 +171,40 @@ public:
     /* These are the methods that we override from ADDriver */
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
     virtual asynStatus writeFloat64(asynUser *pasynUser, epicsFloat64 value);
-    virtual asynStatus writeOctet(asynUser *pasynUser, const char *value,
-                                  size_t nChars, size_t *nActual);
-    virtual asynStatus drvUserCreate(asynUser *pasynUser, const char *drvInfo,
-                                     const char **pptypeName, size_t *psize);
     void report(FILE *fp, int details);
 
     /* These are the methods that are new to this class */
     void imageAcquisitionTask();
 protected:
+    int AdscReadCondition;
+    #define FIRST_ADSC_PARAM AdscReadCondition
+    int AdscState;
+    int AdscStatus;
+    int AdscLastError;
+    int AdscSoftwareReset;
+    int AdscLastImage;
+    int AdscOkToExpose;
+    int AdscExternSwTriggerControl;
+    int AdscReuseDarks;
+    int AdscDezinger;
+    int AdscAdc;
+    int AdscRaw;
+    int AdscImageTransform;
+    int AdscStoredDarks;
+    int AdscBeamCenterX;
+    int AdscBeamCenterY;
+    int AdscDistance;
+    int AdscTwoTheta;
+    int AdscAxis;
+    int AdscWavelength;
+    int AdscImageWidth;
+    int AdscPhi;
+    int AdscOmega;
+    int AdscKappa;
+    int AdscPrivateStopExpRetryCnt;
+    #define LAST_ADSC_PARAM AdscPrivateStopExpRetryCnt
+
+
     AdscStatus_t acquireImages();
     void acquisitionFinished(int adstatus);
     void clearLastDarksParameters();
@@ -285,6 +277,8 @@ protected:
     epicsEventId stopTriggerEventId;
     epicsEventId lastImageEventId;
 };
+#define NUM_ADSC_PARAMS (&LAST_ADSC_PARAM - &FIRST_ADSC_PARAM + 1)
+
 
 /** Called when asyn clients call pasynInt32->write().
   * This function performs actions for some parameters, including ADAcquire,
@@ -302,55 +296,50 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
     int adstatus;
     const char *functionName = "writeInt32";
 
-    switch (function) {
-        case ADBinX:
-        case ADBinY:
+    if ((function == ADBinX) ||
+        (function == ADBinY)) {
             if (value < 1 || value > 2) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setBinModeInParams(value);
-            break;
-        case ADImageMode:
+    } else if (function == ADImageMode) {
             if (value != ADImageSingle && value != ADImageMultiple &&
                     value != ADImageContinuous) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, ADImageMode, value);
-            break;
-        case ADTriggerMode:
+    } else if (function == ADTriggerMode) {
             if (value < 0 || value >= NUM_START_TRIGGER_MODES) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, ADTriggerMode, value);
-            break;
-        case ADNumImages:
+    } else if (function == ADNumImages) {
             if (value < 0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, ADNumImages, value);
-            break;
-        case ADAcquire:
+    } else if (function == ADAcquire) {
             if (value < 0 || value > 1) {
                 status = asynError;
-                break;
+                goto done;
             }
 
             status |= getIntegerParam(addr, ADAcquire, &acquire);
             status |= getIntegerParam(addr, ADStatus, &adstatus);
             if (status != asynSuccess) {
                 status = asynError;
-                break;
+                goto done;
             }
-            if (value == acquire) break;
+            if (value == acquire) goto done;
 
             status |= setIntegerParam(addr, ADAcquire, value);
             if (status != asynSuccess) {
                 status = asynError;
-                break;
+                goto done;
             }
 
             if (value == 1) {
@@ -361,7 +350,7 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
                     status |= resetControlLibrary();
                     if (status != 0) {
                         status = asynError;
-                        break;
+                        goto done;
                     }
                 }
                 /* Clear events. */
@@ -379,118 +368,103 @@ asynStatus adsc::writeInt32(asynUser *pasynUser, epicsInt32 value)
                 epicsEventSignal(this->startTriggerEventId);
                 epicsEventSignal(this->stopTriggerEventId);
             }
-            break;
-        case NDArrayCounter:
+    } else if (function == NDArrayCounter) {
             if (value < 0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, NDArrayCounter, value);
-            break;
-        case NDFileNumber:
+    } else if (function == NDFileNumber) {
             if (value < 0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, NDFileNumber, value);
-            break;
-        case NDAutoIncrement:
+    } else if (function == NDAutoIncrement) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, NDAutoIncrement, value);
-            break;
-        case AdscReadCondition:
+    } else if (function == AdscReadCondition) {
             status |= readDetectorCondition();
-            break;
-        case AdscSoftwareReset:
+    } else if (function == AdscSoftwareReset) {
             status |= getIntegerParam(addr, ADAcquire, &acquire);
-            if (status != 0 || acquire == 1) break;
+            if (status != 0 || acquire == 1) goto done;
             status |= resetControlLibrary();
-            break;
-        case AdscLastImage:
+    } else if (function == AdscLastImage) {
             status |= getIntegerParam(addr, ADAcquire, &acquire);
-            if (status != 0 || acquire == 0) break;
+            if (status != 0 || acquire == 0) goto done;
             epicsEventSignal(this->lastImageEventId);
-            break;
-        case AdscExternSwTriggerControl:
+    } else if (function == AdscExternSwTriggerControl) {
             if (value < 0 || value > 3) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= getIntegerParam(addr, ADAcquire, &acquire);
-            if (status != 0 || acquire == 0) break;
+            if (status != 0 || acquire == 0) goto done;
             status |= setIntegerParam(addr, AdscExternSwTriggerControl,
                                       value);
             if (value == AdscExternSwTriggerControlStart)
                 epicsEventSignal(this->startTriggerEventId);
             else if (value == AdscExternSwTriggerControlStop)
                 epicsEventSignal(this->stopTriggerEventId);
-            break;
-        case AdscReuseDarks:
+    } else if (function == AdscReuseDarks) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscReuseDarks, value);
-            break;
-        case AdscDezinger:
+    } else if (function == AdscDezinger) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscDezinger, value);
-            break;
-        case AdscAdc:
+    } else if (function == AdscAdc) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscAdc, value);
-            break;
-        case AdscRaw:
+    } else if (function == AdscRaw) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscRaw, value);
-            break;
-        case AdscImageTransform:
+    } else if (function == AdscImageTransform) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscImageTransform, value);
-            break;
-        case AdscStoredDarks:
+    } else if (function == AdscStoredDarks) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscStoredDarks, value);
             if (value == 0) clearLastDarksParameters();
-            break;
-        case AdscAxis:
+    } else if (function == AdscAxis) {
             if (value != 0 && value != 1) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setIntegerParam(addr, AdscAxis, value);
-            break;
-        case AdscPrivateStopExpRetryCnt:
+    } else if (function == AdscPrivateStopExpRetryCnt) {
             #ifdef USE_SIMADSC
                 simadscSetStopExposureRetryCount(value);
             #endif
-            break;
-        default:
+            goto done;
+    } else {
             /* If this is not a parameter we have handled, call the base
              * class */
-            if (function < ADLastStdParam)
+            if (function < FIRST_ADSC_PARAM)
                 status = ADDriver::writeInt32(pasynUser, value);
-            break;
     }
 
+    done:
     status |= callParamCallbacks(addr, addr);
 
     if (status != asynSuccess)
@@ -519,63 +493,52 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     int addr = 0;
     const char *functionName = "writeFloat64";
 
-    switch (function) {
-        case ADAcquireTime:
+    if (function == ADAcquireTime) {
             if (value < 0.0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setDoubleParam(addr, ADAcquireTime, value);
-            break;
-        case ADAcquirePeriod:
+    } else if (function == ADAcquirePeriod) {
             if (value < 0.0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setDoubleParam(addr, ADAcquirePeriod, value);
-            break;
-        case AdscBeamCenterX:
+    } else if (function == AdscBeamCenterX) {
             status |= setDoubleParam(addr, AdscBeamCenterX, value);
-            break;
-        case AdscBeamCenterY:
+    } else if (function == AdscBeamCenterY) {
             status |= setDoubleParam(addr, AdscBeamCenterY, value);
-            break;
-        case AdscDistance:
+    } else if (function == AdscDistance) {
             if (value < 0.0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setDoubleParam(addr, AdscDistance, value);
-            break;
-        case AdscTwoTheta:
+    } else if (function == AdscTwoTheta) {
             status |= setDoubleParam(addr, AdscTwoTheta, value);
-            break;
-        case AdscWavelength:
+    } else if (function == AdscWavelength) {
             if (value < 0.0) {
                 status = asynError;
-                break;
+                goto done;
             }
             status |= setDoubleParam(addr, AdscWavelength, value);
-            break;
-        case AdscImageWidth:
+    } else if (function == AdscImageWidth) {
             status |= setDoubleParam(addr, AdscImageWidth, value);
-            break;
-        case AdscPhi:
+    } else if (function == AdscPhi) {
             status |= setDoubleParam(addr, AdscPhi, value);
-            break;
-        case AdscOmega:
+    } else if (function == AdscOmega) {
             status |= setDoubleParam(addr, AdscOmega, value);
-            break;
-        case AdscKappa:
+    } else if (function == AdscKappa) {
             status |= setDoubleParam(addr, AdscKappa, value);
-            break;
-        default:
+    } else {
             /* If this is not a parameter we have handled, call the base
              * class */
-            if (function < ADLastStdParam)
+            if (function < FIRST_ADSC_PARAM)
                 status = ADDriver::writeFloat64(pasynUser, value);
-            break;
     }
+    
+    done:
 
     status |= callParamCallbacks(addr, addr);
 
@@ -589,82 +552,6 @@ asynStatus adsc::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
                   driverName, functionName, function, value);
 
     return (asynStatus)status;
-}
-
-/** Called when asyn clients call pasynOctet->write().
-  * This function performs actions for some parameters, including NDFilePath,
-  * etc. For all parameters it sets the value in the parameter library and
-  * calls any registered callbacks.
-  * \param[in] pasynUser pasynUser structure that encodes the reason and
-  *                      address
-  * \param[in] value Value to write
-  * \param[in] nChars Number of characters to write
-  * \param[out] nActual Number of characters actually written */
-asynStatus adsc::writeOctet(asynUser *pasynUser, const char *value,
-                            size_t nChars, size_t *nActual)
-{
-    int function = pasynUser->reason;
-    int status = asynSuccess;
-    int addr = 0;
-    const char *functionName = "writeOctet";
-
-    switch (function) {
-        case NDFilePath:
-        case NDFileName:
-        case NDFileTemplate:
-            status |= setStringParam(addr, function, (char *)value);
-            break;
-        default:
-            /* If this is not a parameter we have handled, call the base
-             * class */
-            if (function < ADLastStdParam)
-                status = ADDriver::writeOctet(pasynUser, value, nChars,
-                                              nActual);
-            break;
-    }
-
-    status |= callParamCallbacks(addr, addr);
-
-    if (status != asynSuccess)
-        asynPrint(pasynUser, ASYN_TRACE_ERROR,
-                  "%s:%s: error, status=%d function=%d, value=%s\n",
-                  driverName, functionName, status, function, value);
-    else
-        asynPrint(pasynUser, ASYN_TRACEIO_DRIVER,
-                  "%s:%s: function=%d, value=%s\n",
-                  driverName, functionName, function, value);
-
-    *nActual = nChars;
-    return (asynStatus)status;
-}
-
-/** Sets pasynUser->reason to one of the enum values for the parameters
-  * defined for this class if the drvInfo field matches one the strings
-  * defined for it.
-  * If the parameter is not recognized by this class then calls
-  * ADDriver::drvUserCreate.
-  * Uses asynPortDriver::drvUserCreateParam.
-  * \param[in] pasynUser pasynUser structure that driver modifies
-  * \param[in] drvInfo String containing information about what driver
-  *                    function is being referenced
-  * \param[out] pptypeName Location in which driver puts a copy of drvInfo
-  * \param[out] psize Location where driver puts size of param
-  * \return asynSuccess if a matching string was found, asynError if not found
-  */
-asynStatus adsc::drvUserCreate(asynUser *pasynUser,
-                                       const char *drvInfo,
-                                       const char **pptypeName, size_t *psize)
-{
-    asynStatus status;
-
-    status = this->drvUserCreateParam(pasynUser, drvInfo, pptypeName, psize,
-                                      AdscParamString, NUM_ADSC_PARAMS);
-
-    /* If not, then call the base class method, see if it is known there */
-    if (status)
-        status = ADDriver::drvUserCreate(pasynUser, drvInfo, pptypeName,
-                                         psize);
-    return(status);
 }
 
 /** Report status of the driver.
@@ -712,7 +599,7 @@ extern "C" int adscConfig(const char *portName, const char *modelName)
   *            are "Q4", "Q4r", "Q210", "Q210r", "Q270", "Q315", or "Q315r"
   */
 adsc::adsc(const char *portName, const char *modelName)
-    : ADDriver(portName, 1, ADLastDriverParam,
+    : ADDriver(portName, 1, NUM_ADSC_PARAMS,
                0, 0,             /* maxBuffers and maxMemory are 0 because we
                                   * don't support NDArray callbacks yet */
                0, 0,             /* No interfaces beyond those set in
@@ -735,6 +622,32 @@ adsc::adsc(const char *portName, const char *modelName)
                 "configured only once for one port\n", functionName);
         return;
     }
+
+    addParam(AdscReadConditionString,           &AdscReadCondition);
+    addParam(AdscStateString,                   &AdscState);
+    addParam(AdscStatusString,                  &AdscStatus);
+    addParam(AdscLastErrorString,               &AdscLastError);
+    addParam(AdscSoftwareResetString,           &AdscSoftwareReset);
+    addParam(AdscLastImageString,               &AdscLastImage);
+    addParam(AdscOkToExposeString,              &AdscOkToExpose);
+    addParam(AdscExternSwTriggerControlString,  &AdscExternSwTriggerControl);
+    addParam(AdscReuseDarksString,              &AdscReuseDarks);
+    addParam(AdscDezingerString,                &AdscDezinger);
+    addParam(AdscAdcString,                     &AdscAdc);
+    addParam(AdscRawString,                     &AdscRaw);
+    addParam(AdscImageTransformString,          &AdscImageTransform);
+    addParam(AdscStoredDarksString,             &AdscStoredDarks);
+    addParam(AdscBeamCenterXString,             &AdscBeamCenterX);
+    addParam(AdscBeamCenterYString,             &AdscBeamCenterY);
+    addParam(AdscDistanceString,                &AdscDistance);
+    addParam(AdscTwoThetaString,                &AdscTwoTheta);
+    addParam(AdscAxisString,                    &AdscAxis);
+    addParam(AdscWavelengthString,              &AdscWavelength);
+    addParam(AdscImageWidthString,              &AdscImageWidth);
+    addParam(AdscPhiString,                     &AdscPhi);
+    addParam(AdscOmegaString,                   &AdscOmega);
+    addParam(AdscKappaString,                   &AdscKappa);
+    addParam(AdscPrivateStopExpRetryCntString,  &AdscPrivateStopExpRetryCnt);
 
     for (i = 0; i < NUM_ADSC_MODELS; i++) {
         if (strcmp(AdscModelStrings[i], modelName) != 0) continue;
