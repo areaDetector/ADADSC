@@ -623,31 +623,31 @@ adsc::adsc(const char *portName, const char *modelName)
         return;
     }
 
-    addParam(AdscReadConditionString,           &AdscReadCondition);
-    addParam(AdscStateString,                   &AdscState);
-    addParam(AdscStatusString,                  &AdscStatus);
-    addParam(AdscLastErrorString,               &AdscLastError);
-    addParam(AdscSoftwareResetString,           &AdscSoftwareReset);
-    addParam(AdscLastImageString,               &AdscLastImage);
-    addParam(AdscOkToExposeString,              &AdscOkToExpose);
-    addParam(AdscExternSwTriggerControlString,  &AdscExternSwTriggerControl);
-    addParam(AdscReuseDarksString,              &AdscReuseDarks);
-    addParam(AdscDezingerString,                &AdscDezinger);
-    addParam(AdscAdcString,                     &AdscAdc);
-    addParam(AdscRawString,                     &AdscRaw);
-    addParam(AdscImageTransformString,          &AdscImageTransform);
-    addParam(AdscStoredDarksString,             &AdscStoredDarks);
-    addParam(AdscBeamCenterXString,             &AdscBeamCenterX);
-    addParam(AdscBeamCenterYString,             &AdscBeamCenterY);
-    addParam(AdscDistanceString,                &AdscDistance);
-    addParam(AdscTwoThetaString,                &AdscTwoTheta);
-    addParam(AdscAxisString,                    &AdscAxis);
-    addParam(AdscWavelengthString,              &AdscWavelength);
-    addParam(AdscImageWidthString,              &AdscImageWidth);
-    addParam(AdscPhiString,                     &AdscPhi);
-    addParam(AdscOmegaString,                   &AdscOmega);
-    addParam(AdscKappaString,                   &AdscKappa);
-    addParam(AdscPrivateStopExpRetryCntString,  &AdscPrivateStopExpRetryCnt);
+    createParam(AdscReadConditionString,           asynParamInt32,   &AdscReadCondition);
+    createParam(AdscStateString,                   asynParamInt32,   &AdscState);
+    createParam(AdscStatusString,                  asynParamOctet,   &AdscStatus);
+    createParam(AdscLastErrorString,               asynParamOctet,   &AdscLastError);
+    createParam(AdscSoftwareResetString,           asynParamInt32,   &AdscSoftwareReset);
+    createParam(AdscLastImageString,               asynParamInt32,   &AdscLastImage);
+    createParam(AdscOkToExposeString,              asynParamInt32,   &AdscOkToExpose);
+    createParam(AdscExternSwTriggerControlString,  asynParamInt32,   &AdscExternSwTriggerControl);
+    createParam(AdscReuseDarksString,              asynParamInt32,   &AdscReuseDarks);
+    createParam(AdscDezingerString,                asynParamInt32,   &AdscDezinger);
+    createParam(AdscAdcString,                     asynParamInt32,   &AdscAdc);
+    createParam(AdscRawString,                     asynParamInt32,   &AdscRaw);
+    createParam(AdscImageTransformString,          asynParamInt32,   &AdscImageTransform);
+    createParam(AdscStoredDarksString,             asynParamInt32,   &AdscStoredDarks);
+    createParam(AdscBeamCenterXString,             asynParamFloat64, &AdscBeamCenterX);
+    createParam(AdscBeamCenterYString,             asynParamFloat64, &AdscBeamCenterY);
+    createParam(AdscDistanceString,                asynParamFloat64, &AdscDistance);
+    createParam(AdscTwoThetaString,                asynParamFloat64, &AdscTwoTheta);
+    createParam(AdscAxisString,                    asynParamInt32,   &AdscAxis);
+    createParam(AdscWavelengthString,              asynParamFloat64, &AdscWavelength);
+    createParam(AdscImageWidthString,              asynParamFloat64, &AdscImageWidth);
+    createParam(AdscPhiString,                     asynParamFloat64, &AdscPhi);
+    createParam(AdscOmegaString,                   asynParamFloat64, &AdscOmega);
+    createParam(AdscKappaString,                   asynParamFloat64, &AdscKappa);
+    createParam(AdscPrivateStopExpRetryCntString,  asynParamInt32,   &AdscPrivateStopExpRetryCnt);
 
     for (i = 0; i < NUM_ADSC_MODELS; i++) {
         if (strcmp(AdscModelStrings[i], modelName) != 0) continue;
