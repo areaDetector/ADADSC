@@ -65,6 +65,8 @@ ifeq (YES, $(USE_SIMADSC))
 endif
 
 LIB_LIBS += NDPlugin ADBase
+LIB_LIBS_Linux += PvAPI ImageLib
+LIB_LIBS_WIN32 += PvAPI ImageLib
 ifeq (NO, $(USE_SIMADSC))
   LIB_LIBS += detcon_th auxlib
 endif
@@ -88,6 +90,8 @@ adscApp_SRCS_vxWorks += adscApp_registerRecordDeviceDriver.cpp
 # Add locally compiled object code
 adscApp_LIBS += adsc
 adscApp_LIBS += NDPlugin ADBase netCDF
+adscApp_LIBS_Linux += PvAPI ImageLib
+adscApp_LIBS_WIN32 += PvAPI ImageLib
 ifeq (NO, $(USE_SIMADSC))
   adscApp_LIBS += detcon_th auxlib
 endif
