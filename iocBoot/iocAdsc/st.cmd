@@ -15,9 +15,9 @@ epicsEnvSet("QSIZE",  "20")
 #              "Q210r", "Q270", "Q315", or "Q315r"
 #
 adscConfig("$(PORT)","Q210r")
-dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/ADBase.template","P=$(PREFIX),R=det1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
-dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/adsc.template",  "P=$(PREFIX),R=det1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
-dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/NDFile.template","P=$(PREFIX),R=det1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
+dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/ADBase.template","P=$(PREFIX),R=cam1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
+dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/adsc.template",  "P=$(PREFIX),R=cam1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
+dbLoadRecords("$(AREA_DETECTOR)/ADApp/Db/NDFile.template","P=$(PREFIX),R=cam1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
 
 #asynSetTraceMask("$(PORT)",0,255)
 
@@ -32,4 +32,4 @@ dbLoadRecords("$(AUTOSAVE)/asApp/Db/save_restoreStatus.db","P=$(PREFIX)")
 iocInit()
 
 # save things every thirty seconds
-create_monitor_set("auto_settings.req",30,"P=$(PREFIX),R=det1:")
+create_monitor_set("auto_settings.req",30,"P=$(PREFIX),R=cam1:")
