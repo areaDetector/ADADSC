@@ -113,8 +113,9 @@ PROD_LIBS_Linux        += tiff jpeg z
 #PROD_SYS_LIBS_Linux    += tiff jpeg z
 
 PROD_SYS_LIBS_Darwin  += NeXus mfhdf df hdf5 mxml tiff jpeg z
-PROD_SYS_LIBS_solaris += NeXus mfhdf df hdf5 mxml tiff jpeg z
 
+PROD_LIBS_solaris    += NeXusCPP NeXus hdf5_cpp hdf5 mxml jpeg sz z
+PROD_SYS_LIBS_solaris   += tiff
 
 #=============================
 
