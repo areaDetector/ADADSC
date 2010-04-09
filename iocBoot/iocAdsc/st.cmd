@@ -7,6 +7,8 @@ adscApp_registerRecordDeviceDriver(pdbbase)
 epicsEnvSet("PREFIX", "13ADCS1:")
 epicsEnvSet("PORT",   "ADSC1")
 epicsEnvSet("QSIZE",  "20")
+epicsEnvSet("XSIZE",  "2048")
+epicsEnvSet("YSIZE",  "2048")
 
 #
 # adscConfig(const char *portName, const char *modelName)
