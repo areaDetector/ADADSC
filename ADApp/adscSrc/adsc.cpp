@@ -1037,10 +1037,8 @@ AdscStatus_t adsc::acquireImages()
         status = epicsTimeGetCurrent(&startTime);
         assert(status == epicsTimeOK);
 
-        if (i != 0) {
-            status = loadPerImageParameters();
-            if (status != AdscStatusOk) return AdscStatusError;
-        }
+        status = loadPerImageParameters();
+        if (status != AdscStatusOk) return AdscStatusError;
 
         status = takeImage(this->perImageFullFileName, imageKind,
                            i == this->perDatasetNumImages - 1 ? 1 : 0,
@@ -1154,7 +1152,7 @@ AdscStatus_t adsc::createFileNameNoIncrement(char *dst, size_t dstSize)
 
     asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
               "%s:createFileNameNoIncrement error, getting or setting "
-              "ADAutoIncrement or ADUtils->createFileNameNoIncrement failed "
+              "ADAutoIncrement, or asynNDArrayDriver::createFileName failed "
               "with ORed status=%d\n", driverName, status);
     return AdscStatusError;
 }
