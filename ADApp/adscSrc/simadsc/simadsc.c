@@ -8,12 +8,21 @@
  */
 
 #include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <detcon_entry.h>
 #include <detcon_par.h>
 #include <detcon_state.h>
 #include "simadsc.h"
+
+
+#define SIMADSC_NAME "simadsc"
+#define THIS_FILE_NAME "simadsc.c"
+#define XRAY_IMAGE_ENV_VAR_NAME "SIMADSC_XRAY_IMAGE"
+#define IO_BUFFER_SIZE 8192
 
 static double SimadscReadoutTimes[][3] = {
  /* 1,   2hw,  2sw (1x1, 2x2 hardware, 2x2 software) in seconds */
@@ -61,10 +70,12 @@ static char  FlpSuffix[PARAMETER_STRING_SIZE];
 
 static double computeTimeDifference(struct timeval *time1,
   struct timeval *time0);
+static int copyFile(const char *srcFileName, const char *destFileName);
 static SimadscBinMode_t getBinMode(void);
 static void initialize(void);
 static int shouldInitializeHaveFinishedByNow(void);
 static int shouldReadoutHaveFinishedByNow(void);
+static int writeSimulatedImageToDiskIfAvailable(void);
 
 
 int CCDStartExposure() {
@@ -274,7 +285,7 @@ int CCDGetImage() {
     return 1;
   }
 
-  return 0;
+  return CCDWriteImage();
 }
 
 int CCDCorrectImage() {
@@ -289,6 +300,12 @@ int CCDWriteImage() {
     LastError = Status;
     return 1;
   }
+
+  /* real ADSC implementation ignores return value so ignore it here too;
+   * real ADSC implementation does not wait for image to be written to disk --
+   * in this way the simulation differs (i.e. it *does* wait for the image to
+   * be written to disk) to allow the simulation to remain very simple */
+  writeSimulatedImageToDiskIfAvailable();
 
   return 0;
 }
@@ -333,6 +350,75 @@ static double computeTimeDifference(struct timeval *time1,
     struct timeval *time0) {
   return (double)(time1->tv_sec - time0->tv_sec) +
     ((double)(time1->tv_usec - time0->tv_usec) / 1000000.0);
+}
+
+static int copyFile(const char *srcFileName, const char *destFileName) {
+  FILE *srcFile;
+  FILE *destFile;
+  int status;
+  char *buffer[IO_BUFFER_SIZE];
+  size_t numRead;
+  size_t numWritten;
+  int hadError;
+
+  srcFile = fopen(srcFileName, "rb");
+  if (srcFile == NULL) {
+    fprintf(stderr, "%s:%s:%d:copyFile(): Failed to open source file \"%s\"; "
+      "%s\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, srcFileName,
+      strerror(errno));
+    return 1;
+  }
+
+  destFile = fopen(destFileName, "wb");
+  if (destFile == NULL) {
+    fprintf(stderr, "%s:%s:%d:copyFile(): Failed to open destination file "
+      "\"%s\"; %s\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, destFileName,
+      strerror(errno));
+    status = fclose(srcFile);
+    if (status != 0)
+      fprintf(stderr, "%s:%s:%d:copyFile(): Failed to close source file "
+        "\"%s\"; %s\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, srcFileName,
+        strerror(errno));
+    return 1;
+  }
+
+  hadError = 0;
+  for (;;) {
+    numRead = fread(buffer, sizeof(buffer[0]), IO_BUFFER_SIZE, srcFile);
+    if (numRead == 0) {
+      if (ferror(srcFile)) {
+        fprintf(stderr, "%s:%s:%d:copyFile(): Failed to read source file "
+          "\"%s\"\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, srcFileName);
+        hadError = 1;
+      }
+      break;
+    }
+    numWritten = fwrite(buffer, sizeof(buffer[0]), numRead, destFile);
+    if (numWritten < numRead) {
+      fprintf(stderr, "%s:%s:%d:copyFile(): Failed to write destination file "
+        "\"%s\"\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, destFileName);
+      hadError = 1;
+      break;
+    }
+  }
+
+  status = fclose(destFile);
+  if (status != 0) {
+    fprintf(stderr, "%s:%s:%d:copyFile(): Failed to close destination file "
+      "\"%s\"; %s\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, destFileName,
+      strerror(errno));
+    hadError = 1;
+  }
+
+  status = fclose(srcFile);
+  if (status != 0) {
+    fprintf(stderr, "%s:%s:%d:copyFile(): Failed to close source file \"%s\" "
+      "; %s\n", SIMADSC_NAME, THIS_FILE_NAME, __LINE__, srcFileName,
+      strerror(errno));
+    hadError = 1;
+  }
+
+  return hadError ? 1 : 0;
 }
 
 static void initialize(void) {
@@ -393,6 +479,17 @@ static int shouldReadoutHaveFinishedByNow(void) {
   assert(status == 0);
   return computeTimeDifference(&timeNow, &StartReadingTime) >
     SimadscReadoutTimes[Model][binMode];
+}
+
+static int writeSimulatedImageToDiskIfAvailable(void) {
+  char *simulatedImageFileName;
+
+  if (!(FlpKind == 4 || FlpKind == 5)) return 0;
+  simulatedImageFileName = getenv(XRAY_IMAGE_ENV_VAR_NAME);
+  if (simulatedImageFileName == NULL) return 0;
+  if (strlen(simulatedImageFileName) == 0) return 0;
+
+  return copyFile(simulatedImageFileName, FlpFileName);
 }
 
 

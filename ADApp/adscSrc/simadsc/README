@@ -11,3 +11,11 @@ locations in the ADSC detector control software package:
   src_std/detcon_lib_th/detcon_entry.h
   src_std/incl/detcon_par.h
   src_std/incl/detcon_state.h
+
+By default, simadsc does not write simulated images to disk.  However, it does
+support a rudimentary way to do so via the environment variable
+SIMADSC_XRAY_IMAGE.  If this variable is set to the full file name of an image
+(e.g. "/tmp/thaumatin.img"), simadsc, when asked to acquire an image, will
+read the image specified in SIMADSC_XRAY_IMAGE and write its contents to disk
+as the acquired image.  Setting SIMADSC_XRAY_IMAGE to the empty string or not
+setting it at all disables this functionality.
