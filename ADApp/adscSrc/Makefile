@@ -89,9 +89,10 @@ adscApp_SRCS_vxWorks += adscApp_registerRecordDeviceDriver.cpp
 
 # Add locally compiled object code
 adscApp_LIBS += adsc
-adscApp_LIBS += NDPlugin ADBase netCDF
-adscApp_LIBS_Linux += PvAPI ImageLib
-adscApp_LIBS_WIN32 += PvAPI ImageLib
+adscApp_LIBS += ADBase
+#adscApp_LIBS += NDPlugin netCDF
+#adscApp_LIBS_Linux += PvAPI ImageLib
+#adscApp_LIBS_WIN32 += PvAPI ImageLib
 ifeq (NO, $(USE_SIMADSC))
   adscApp_LIBS += detcon_th auxlib
 endif
@@ -99,23 +100,23 @@ adscApp_LIBS += busy sscan autosave
 adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
-PROD_LIBS_cygwin32     += libtiff jpeg libNeXus.dll
+#PROD_LIBS_cygwin32     += libtiff jpeg libNeXus.dll
 PROD_SYS_LIBS_cygwin32 += rpc
 
 # To use versions of these libraries supplied with areaDetector use this line
-PROD_LIBS_Linux        += NeXus mfhdf df hdf5 mxml
+#PROD_LIBS_Linux        += NeXus mfhdf df hdf5 mxml
 # To use system versions of these libraries use this line
 #PROD_SYS_LIBS_Linux    += NeXus mfhdf df hdf5 mxml
 
 # To use versions of these libraries supplied with areaDetector use this line
-PROD_LIBS_Linux        += tiff jpeg z
+#PROD_LIBS_Linux        += tiff jpeg z
 # To use system versions of these libraries use this line
 #PROD_SYS_LIBS_Linux    += tiff jpeg z
 
-PROD_SYS_LIBS_Darwin  += NeXus mfhdf df hdf5 mxml tiff jpeg z
+#PROD_SYS_LIBS_Darwin  += NeXus mfhdf df hdf5 mxml tiff jpeg z
 
-PROD_LIBS_solaris    += NeXusCPP NeXus hdf5_cpp hdf5 mxml jpeg sz z
-PROD_SYS_LIBS_solaris   += tiff
+#PROD_LIBS_solaris    += NeXusCPP NeXus hdf5_cpp hdf5 mxml jpeg sz z
+#PROD_SYS_LIBS_solaris   += tiff
 
 #=============================
 
