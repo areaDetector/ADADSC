@@ -4,6 +4,11 @@ include $(TOP)/configure/CONFIG
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 #=============================
 
+# NOTE: There are lots of lines that are commented out in this Makefile because
+# the adsc driver does not yet support reading back the arrays from disk and doing
+# callbacks.  Thus, the application does not need to link to the NDPlugin library,
+# or any of the libraries that the plugins use.  In the future this may change.
+
 # Set to YES or NO to use or not use the simadsc simulation library instead of
 # the real ADSC detcon_lib_th library
 
@@ -64,9 +69,10 @@ ifeq (YES, $(USE_SIMADSC))
   LIB_SRCS += simadsc.c
 endif
 
-LIB_LIBS += NDPlugin ADBase
-LIB_LIBS_Linux += PvAPI ImageLib
-LIB_LIBS_WIN32 += PvAPI ImageLib
+LIB_LIBS += ADBase
+#LIB_LIBS += NDPlugin
+#LIB_LIBS_Linux += PvAPI ImageLib
+#LIB_LIBS_WIN32 += PvAPI ImageLib
 ifeq (NO, $(USE_SIMADSC))
   LIB_LIBS += detcon_th auxlib
 endif
