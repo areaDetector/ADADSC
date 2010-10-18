@@ -107,7 +107,7 @@ adscApp_LIBS += asyn
 adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #PROD_LIBS_cygwin32     += libtiff jpeg libNeXus.dll
-PROD_SYS_LIBS_cygwin32 += rpc
+PROD_SYS_LIBS_cygwin32 += $(CYGWIN_RPC_LIB)
 
 # To use versions of these libraries supplied with areaDetector use this line
 #PROD_LIBS_Linux        += NeXus mfhdf df hdf5 mxml
