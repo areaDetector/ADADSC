@@ -277,7 +277,7 @@ protected:
     epicsEventId stopTriggerEventId;
     epicsEventId lastImageEventId;
 };
-#define NUM_ADSC_PARAMS (&LAST_ADSC_PARAM - &FIRST_ADSC_PARAM + 1)
+#define NUM_ADSC_PARAMS ((int)(&LAST_ADSC_PARAM - &FIRST_ADSC_PARAM + 1))
 
 
 /** Called when asyn clients call pasynInt32->write().
