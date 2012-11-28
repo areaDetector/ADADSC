@@ -121,15 +121,9 @@ static const char *AdscCcdStateStrings[] = {
   * database (or the ADBase.template database if the default is used) */
 typedef enum {
     AdscTriggerStartInternal,
-    AdscTriggerStartExternSw
+    AdscTriggerStartExternSw,
+    NUM_START_TRIGGER_MODES
 } AdscTriggerStartMode_t;
-
-static const char *AdscTriggerStartStrings[] = {
-    "Internal","Ext. Software"
-};
-
-#define NUM_START_TRIGGER_MODES ((int)(sizeof(AdscTriggerStartStrings) / \
-    sizeof(AdscTriggerStartStrings[0])))
 
 /** Driver-specific parameters for the ADSC driver */
 #define AdscReadConditionString          "ADSC_READ_CONDITION"
