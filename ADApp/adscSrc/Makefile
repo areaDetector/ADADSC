@@ -81,12 +81,14 @@ LIB_LIBS += asyn
 LIB_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #==================================
-PROD_IOC_cygwin32 += adscApp
-PROD_IOC_Darwin   += adscApp
-PROD_IOC_Linux    += adscApp
-PROD_IOC_solaris  += adscApp
+PROD_NAME = adscApp
+PROD_IOC_cygwin32 += $(PROD_NAME)
+PROD_IOC_Darwin   += $(PROD_NAME)
+PROD_IOC_Linux    += $(PROD_NAME)
+PROD_IOC_solaris  += $(PROD_NAME)
 # <name>.dbd will be created from <name>Include.dbd
-DBD += adscApp.dbd
+DBD += $(PROD_NAME).dbd
+$(PROD_NAME)_DBD += adscSupport.dbd
 DBD += adscSupport.dbd
 
 # <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
