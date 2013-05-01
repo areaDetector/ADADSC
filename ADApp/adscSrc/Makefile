@@ -2,7 +2,8 @@ TOP=../..
 include $(TOP)/configure/CONFIG
 #----------------------------------------
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
-#=============================
+
+#======== DETECTOR LIBRARY ==============
 
 # NOTE: There are lots of lines that are commented out in this Makefile because
 # the adsc driver does not yet support reading back the arrays from disk and doing
@@ -80,7 +81,11 @@ LIB_LIBS += busy sscan autosave
 LIB_LIBS += asyn
 LIB_LIBS += $(EPICS_BASE_IOC_LIBS)
 
-#==================================
+DBD += adscSupport.dbd
+
+#====== DETECTOR APPLICATION ============
+
+ifeq ($(BUILD_APPS), YES)
 PROD_NAME = adscApp
 PROD_IOC_cygwin32 += $(PROD_NAME)
 PROD_IOC_Darwin   += $(PROD_NAME)
@@ -89,24 +94,23 @@ PROD_IOC_solaris  += $(PROD_NAME)
 # <name>.dbd will be created from <name>Include.dbd
 DBD += $(PROD_NAME).dbd
 $(PROD_NAME)_DBD += adscSupport.dbd
-DBD += adscSupport.dbd
 
 # <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
-adscApp_SRCS_DEFAULT += adscApp_registerRecordDeviceDriver.cpp adscAppMain.cpp
-adscApp_SRCS_vxWorks += adscApp_registerRecordDeviceDriver.cpp
+$(PROD_NAME)_SRCS_DEFAULT += $(PROD_NAME)_registerRecordDeviceDriver.cpp $(PROD_NAME)Main.cpp
+$(PROD_NAME)_SRCS_vxWorks += $(PROD_NAME)_registerRecordDeviceDriver.cpp
 
 # Add locally compiled object code
-adscApp_LIBS += adsc
-adscApp_LIBS += ADBase
-#adscApp_LIBS += NDPlugin netCDF
-#adscApp_LIBS_Linux += PvAPI ImageLib
-#adscApp_LIBS_WIN32 += PvAPI ImageLib
+$(PROD_NAME)_LIBS += adsc
+$(PROD_NAME)_LIBS += ADBase
+#$(PROD_NAME)_LIBS += NDPlugin netCDF
+#$(PROD_NAME)_LIBS_Linux += PvAPI ImageLib
+#$(PROD_NAME)_LIBS_WIN32 += PvAPI ImageLib
 ifeq (NO, $(USE_SIMADSC))
-  adscApp_LIBS += detcon_th auxlib
+  $(PROD_NAME)_LIBS += detcon_th auxlib
 endif
-adscApp_LIBS += busy sscan autosave 
-adscApp_LIBS += asyn
-adscApp_LIBS += $(EPICS_BASE_IOC_LIBS)
+$(PROD_NAME)_LIBS += busy sscan autosave 
+$(PROD_NAME)_LIBS += asyn
+$(PROD_NAME)_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #PROD_LIBS_cygwin32     += libtiff jpeg libNeXus.dll
 PROD_SYS_LIBS_cygwin32 += $(CYGWIN_RPC_LIB)
@@ -125,6 +129,7 @@ PROD_SYS_LIBS_cygwin32 += $(CYGWIN_RPC_LIB)
 
 #PROD_LIBS_solaris    += NeXusCPP NeXus hdf5_cpp hdf5 mxml jpeg sz z
 #PROD_SYS_LIBS_solaris   += tiff
+endif
 
 #=============================
 
