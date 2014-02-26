@@ -3,8 +3,6 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 
-#======== DETECTOR LIBRARY ==============
-
 # NOTE: There are lots of lines that are commented out in this Makefile because
 # the adsc driver does not yet support reading back the arrays from disk and doing
 # callbacks.  Thus, the application does not need to link to the NDPlugin library,
@@ -82,54 +80,6 @@ LIB_LIBS += asyn
 LIB_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 DBD += adscSupport.dbd
-
-#====== DETECTOR APPLICATION ============
-
-ifeq ($(BUILD_APPS), YES)
-PROD_NAME = adscApp
-PROD_IOC_cygwin32 += $(PROD_NAME)
-PROD_IOC_Darwin   += $(PROD_NAME)
-PROD_IOC_Linux    += $(PROD_NAME)
-PROD_IOC_solaris  += $(PROD_NAME)
-# <name>.dbd will be created from <name>Include.dbd
-DBD += $(PROD_NAME).dbd
-$(PROD_NAME)_DBD += adscSupport.dbd
-
-# <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
-$(PROD_NAME)_SRCS_DEFAULT += $(PROD_NAME)_registerRecordDeviceDriver.cpp $(PROD_NAME)Main.cpp
-$(PROD_NAME)_SRCS_vxWorks += $(PROD_NAME)_registerRecordDeviceDriver.cpp
-
-# Add locally compiled object code
-$(PROD_NAME)_LIBS += adsc
-$(PROD_NAME)_LIBS += ADBase
-#$(PROD_NAME)_LIBS += NDPlugin netCDF
-#$(PROD_NAME)_LIBS_Linux += PvAPI ImageLib
-#$(PROD_NAME)_LIBS_WIN32 += PvAPI ImageLib
-ifeq (NO, $(USE_SIMADSC))
-  $(PROD_NAME)_LIBS += detcon_th auxlib
-endif
-$(PROD_NAME)_LIBS += busy sscan autosave 
-$(PROD_NAME)_LIBS += asyn
-$(PROD_NAME)_LIBS += $(EPICS_BASE_IOC_LIBS)
-
-#PROD_LIBS_cygwin32     += libtiff jpeg libNeXus.dll
-PROD_SYS_LIBS_cygwin32 += $(CYGWIN_RPC_LIB)
-
-# To use versions of these libraries supplied with areaDetector use this line
-#PROD_LIBS_Linux        += NeXus mfhdf df hdf5 mxml
-# To use system versions of these libraries use this line
-#PROD_SYS_LIBS_Linux    += NeXus mfhdf df hdf5 mxml
-
-# To use versions of these libraries supplied with areaDetector use this line
-#PROD_LIBS_Linux        += tiff jpeg z
-# To use system versions of these libraries use this line
-#PROD_SYS_LIBS_Linux    += tiff jpeg z
-
-#PROD_SYS_LIBS_Darwin  += NeXus mfhdf df hdf5 mxml tiff jpeg z
-
-#PROD_LIBS_solaris    += NeXusCPP NeXus hdf5_cpp hdf5 mxml jpeg sz z
-#PROD_SYS_LIBS_solaris   += tiff
-endif
 
 #=============================
 
