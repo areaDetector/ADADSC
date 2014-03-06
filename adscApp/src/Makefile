@@ -68,16 +68,7 @@ ifeq (YES, $(USE_SIMADSC))
   LIB_SRCS += simadsc.c
 endif
 
-LIB_LIBS += ADBase
-#LIB_LIBS += NDPlugin
-#LIB_LIBS_Linux += PvAPI ImageLib
-#LIB_LIBS_WIN32 += PvAPI ImageLib
-ifeq (NO, $(USE_SIMADSC))
-  LIB_LIBS += detcon_th auxlib
-endif
-LIB_LIBS += busy sscan autosave
-LIB_LIBS += asyn
-LIB_LIBS += $(EPICS_BASE_IOC_LIBS)
+include $(ADCORE)/ADApp/commonLibraryMakefile
 
 DBD += adscSupport.dbd
 
