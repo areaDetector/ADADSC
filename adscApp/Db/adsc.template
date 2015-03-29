@@ -3,6 +3,7 @@
 # April 15, 2008
 
 include "ADBase.template"
+include "NDFile.template"
 
 ##############################################################################
 #  Controls how frequently to read the condition of the detector             #
