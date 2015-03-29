@@ -2,6 +2,8 @@
 # J. Lewis Muir (copied and modified prosilica.template by Mark Rivers)
 # April 15, 2008
 
+include "ADBase.template"
+
 ##############################################################################
 #  Controls how frequently to read the condition of the detector             #
 ##############################################################################
