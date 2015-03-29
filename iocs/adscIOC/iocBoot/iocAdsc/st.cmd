@@ -29,7 +29,6 @@ epicsEnvSet("EPICS_DB_INCLUDE_PATH", "$(ADCORE)/db")
 #
 adscConfig("$(PORT)","Q210r")
 dbLoadRecords("$(ADADSC)/db/adsc.template",  "P=$(PREFIX),R=cam1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
-dbLoadRecords("$(ADCORE)/db/NDFile.template","P=$(PREFIX),R=cam1:,PORT=$(PORT),ADDR=0,TIMEOUT=1")
 
 #asynSetTraceMask("$(PORT)",0,255)
 
