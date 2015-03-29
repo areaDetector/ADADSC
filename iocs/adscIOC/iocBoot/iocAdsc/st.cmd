@@ -4,12 +4,22 @@ errlogInit(20000)
 dbLoadDatabase("$(TOP)/dbd/adscApp.dbd")
 adscApp_registerRecordDeviceDriver(pdbbase) 
 
+# Prefix for all records
 epicsEnvSet("PREFIX", "13ADCS1:")
+# The port name for the detector
 epicsEnvSet("PORT",   "ADSC1")
+# The queue size for all plugins
 epicsEnvSet("QSIZE",  "20")
+# The maximim image width; used for row profiles in the NDPluginStats plugin
 epicsEnvSet("XSIZE",  "2048")
+# The maximim image height; used for column profiles in the NDPluginStats plugin
 epicsEnvSet("YSIZE",  "2048")
+# The maximum number of time seried points in the NDPluginStats plugin
 epicsEnvSet("NCHANS", "2048")
+# The maximum number of frames buffered in the NDPluginCircularBuff plugin
+epicsEnvSet("CBUFFS", "500")
+# The search path for database files
+epicsEnvSet("EPICS_DB_INCLUDE_PATH", "$(ADCORE)/db")
 
 #
 # adscConfig(const char *portName, const char *modelName)

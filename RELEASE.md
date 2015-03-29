@@ -23,7 +23,11 @@ files respectively, in the configure/ directory of the appropriate release of th
 Release Notes
 =============
 
-R2-0
+R2-1 (March 29, 2015)
+* Updated st.cmd to be compatible with ADCore R2-2.
+
+
+R2-0 (March 24, 2014)
 ----
 * Moved the repository to [Github](https://github.com/areaDetector/ADADSC).
 * Re-organized the directory structure to separate the driver library from the example IOC application.
