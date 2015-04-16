@@ -23,7 +23,7 @@ files respectively, in the configure/ directory of the appropriate release of th
 Release Notes
 =============
 
-R2-1 (March 29, 2015)
+R2-1 (April 16, 2015)
 * Updated st.cmd to be compatible with ADCore R2-2.
 
 
