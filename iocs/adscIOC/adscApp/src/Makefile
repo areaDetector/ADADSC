@@ -56,7 +56,7 @@ ifeq (NO, $(USE_SIMADSC))
   $(PROD_NAME)_LIBS += detcon_th auxlib
 endif
 
-include $(ADCORE)/ADApp/commonDriverMakefile
+include $(ADEXAMPLE)/exampleApp/commonDriverMakefile
 
 #=============================
 
