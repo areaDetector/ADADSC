@@ -8,6 +8,8 @@ driver for detectors from
 Supported models are: Q4 (with the upgrade to four computers), Q4r, Q210, Q210r, Q270, Q315,
 and Q315r. 
 
+This repository is no longer active and was archived on June 13, 2025.
+
 Additional information:
 * [Documentation](https://cars.uchicago.edu/software/epics/adscDoc.html).
 * [Release notes and links to source and binary releases](RELEASE.md).
